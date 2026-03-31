@@ -15,7 +15,12 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPersonnelRouteImport } from './routes/_authenticated/_personnel'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
+import { Route as AuthenticatedPersonnelPayRouteImport } from './routes/_authenticated/_personnel/pay'
+import { Route as AuthenticatedPersonnelHelpRouteImport } from './routes/_authenticated/_personnel/help'
 import { Route as AuthenticatedPersonnelDashboardRouteImport } from './routes/_authenticated/_personnel/dashboard'
+import { Route as AuthenticatedPersonnelComplaintsIndexRouteImport } from './routes/_authenticated/_personnel/complaints/index'
+import { Route as AuthenticatedPersonnelComplaintsNewRouteImport } from './routes/_authenticated/_personnel/complaints/new'
+import { Route as AuthenticatedPersonnelComplaintsComplaintIdRouteImport } from './routes/_authenticated/_personnel/complaints/$complaintId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -46,10 +51,40 @@ const AuthenticatedAdminDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedPersonnelPayRoute =
+  AuthenticatedPersonnelPayRouteImport.update({
+    id: '/pay',
+    path: '/pay',
+    getParentRoute: () => AuthenticatedPersonnelRoute,
+  } as any)
+const AuthenticatedPersonnelHelpRoute =
+  AuthenticatedPersonnelHelpRouteImport.update({
+    id: '/help',
+    path: '/help',
+    getParentRoute: () => AuthenticatedPersonnelRoute,
+  } as any)
 const AuthenticatedPersonnelDashboardRoute =
   AuthenticatedPersonnelDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
+    getParentRoute: () => AuthenticatedPersonnelRoute,
+  } as any)
+const AuthenticatedPersonnelComplaintsIndexRoute =
+  AuthenticatedPersonnelComplaintsIndexRouteImport.update({
+    id: '/complaints/',
+    path: '/complaints/',
+    getParentRoute: () => AuthenticatedPersonnelRoute,
+  } as any)
+const AuthenticatedPersonnelComplaintsNewRoute =
+  AuthenticatedPersonnelComplaintsNewRouteImport.update({
+    id: '/complaints/new',
+    path: '/complaints/new',
+    getParentRoute: () => AuthenticatedPersonnelRoute,
+  } as any)
+const AuthenticatedPersonnelComplaintsComplaintIdRoute =
+  AuthenticatedPersonnelComplaintsComplaintIdRouteImport.update({
+    id: '/complaints/$complaintId',
+    path: '/complaints/$complaintId',
     getParentRoute: () => AuthenticatedPersonnelRoute,
   } as any)
 
@@ -58,14 +93,24 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedPersonnelDashboardRoute
+  '/help': typeof AuthenticatedPersonnelHelpRoute
+  '/pay': typeof AuthenticatedPersonnelPayRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
+  '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
+  '/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedPersonnelDashboardRoute
+  '/help': typeof AuthenticatedPersonnelHelpRoute
+  '/pay': typeof AuthenticatedPersonnelPayRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
+  '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
+  '/complaints': typeof AuthenticatedPersonnelComplaintsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,13 +120,38 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_personnel/dashboard': typeof AuthenticatedPersonnelDashboardRoute
+  '/_authenticated/_personnel/help': typeof AuthenticatedPersonnelHelpRoute
+  '/_authenticated/_personnel/pay': typeof AuthenticatedPersonnelPayRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/_personnel/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
+  '/_authenticated/_personnel/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
+  '/_authenticated/_personnel/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin' | '/dashboard' | '/admin/dashboard'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/dashboard'
+    | '/help'
+    | '/pay'
+    | '/admin/dashboard'
+    | '/complaints/$complaintId'
+    | '/complaints/new'
+    | '/complaints/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/admin' | '/dashboard' | '/admin/dashboard'
+  to:
+    | '/login'
+    | '/'
+    | '/admin'
+    | '/dashboard'
+    | '/help'
+    | '/pay'
+    | '/admin/dashboard'
+    | '/complaints/$complaintId'
+    | '/complaints/new'
+    | '/complaints'
   id:
     | '__root__'
     | '/_authenticated'
@@ -90,7 +160,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/'
     | '/_authenticated/_personnel/dashboard'
+    | '/_authenticated/_personnel/help'
+    | '/_authenticated/_personnel/pay'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/_personnel/complaints/$complaintId'
+    | '/_authenticated/_personnel/complaints/new'
+    | '/_authenticated/_personnel/complaints/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,6 +217,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/_personnel/pay': {
+      id: '/_authenticated/_personnel/pay'
+      path: '/pay'
+      fullPath: '/pay'
+      preLoaderRoute: typeof AuthenticatedPersonnelPayRouteImport
+      parentRoute: typeof AuthenticatedPersonnelRoute
+    }
+    '/_authenticated/_personnel/help': {
+      id: '/_authenticated/_personnel/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof AuthenticatedPersonnelHelpRouteImport
+      parentRoute: typeof AuthenticatedPersonnelRoute
+    }
     '/_authenticated/_personnel/dashboard': {
       id: '/_authenticated/_personnel/dashboard'
       path: '/dashboard'
@@ -149,16 +238,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPersonnelDashboardRouteImport
       parentRoute: typeof AuthenticatedPersonnelRoute
     }
+    '/_authenticated/_personnel/complaints/': {
+      id: '/_authenticated/_personnel/complaints/'
+      path: '/complaints'
+      fullPath: '/complaints/'
+      preLoaderRoute: typeof AuthenticatedPersonnelComplaintsIndexRouteImport
+      parentRoute: typeof AuthenticatedPersonnelRoute
+    }
+    '/_authenticated/_personnel/complaints/new': {
+      id: '/_authenticated/_personnel/complaints/new'
+      path: '/complaints/new'
+      fullPath: '/complaints/new'
+      preLoaderRoute: typeof AuthenticatedPersonnelComplaintsNewRouteImport
+      parentRoute: typeof AuthenticatedPersonnelRoute
+    }
+    '/_authenticated/_personnel/complaints/$complaintId': {
+      id: '/_authenticated/_personnel/complaints/$complaintId'
+      path: '/complaints/$complaintId'
+      fullPath: '/complaints/$complaintId'
+      preLoaderRoute: typeof AuthenticatedPersonnelComplaintsComplaintIdRouteImport
+      parentRoute: typeof AuthenticatedPersonnelRoute
+    }
   }
 }
 
 interface AuthenticatedPersonnelRouteChildren {
   AuthenticatedPersonnelDashboardRoute: typeof AuthenticatedPersonnelDashboardRoute
+  AuthenticatedPersonnelHelpRoute: typeof AuthenticatedPersonnelHelpRoute
+  AuthenticatedPersonnelPayRoute: typeof AuthenticatedPersonnelPayRoute
+  AuthenticatedPersonnelComplaintsComplaintIdRoute: typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
+  AuthenticatedPersonnelComplaintsNewRoute: typeof AuthenticatedPersonnelComplaintsNewRoute
+  AuthenticatedPersonnelComplaintsIndexRoute: typeof AuthenticatedPersonnelComplaintsIndexRoute
 }
 
 const AuthenticatedPersonnelRouteChildren: AuthenticatedPersonnelRouteChildren =
   {
     AuthenticatedPersonnelDashboardRoute: AuthenticatedPersonnelDashboardRoute,
+    AuthenticatedPersonnelHelpRoute: AuthenticatedPersonnelHelpRoute,
+    AuthenticatedPersonnelPayRoute: AuthenticatedPersonnelPayRoute,
+    AuthenticatedPersonnelComplaintsComplaintIdRoute:
+      AuthenticatedPersonnelComplaintsComplaintIdRoute,
+    AuthenticatedPersonnelComplaintsNewRoute:
+      AuthenticatedPersonnelComplaintsNewRoute,
+    AuthenticatedPersonnelComplaintsIndexRoute:
+      AuthenticatedPersonnelComplaintsIndexRoute,
   }
 
 const AuthenticatedPersonnelRouteWithChildren =
