@@ -17,4 +17,10 @@ export interface User {
   status: ServiceStatus
   dateOfEnlistment: string
   trade: string
+  nin: string
+  bvn: string
+  dateOfBirth: string
+  stateOfOrigin: string
+  phone: string
+  unit: string
 }
