@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '#/components/ui/dialog'
-import { Lock, Eye, Shield, PenLine } from 'lucide-react'
+import { Lock, Eye, PenLine, Shield, Fingerprint, Briefcase, MapPin, Phone, Calendar, Hash, Building2, Users, Award, ChevronRight } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/profile')({
   component: ProfilePage,
@@ -59,7 +59,7 @@ function ProfilePage() {
     }
   }
 
-  function renderSensitiveField(field: SensitiveField, value: string) {
+  function renderSensitiveValue(field: SensitiveField, value: string) {
     const isRevealed = revealedFields.has(field)
     return (
       <button
@@ -73,15 +73,15 @@ function ProfilePage() {
             setCodeError(false)
           }
         }}
-        className="inline-flex items-center gap-2 group/field"
+        className="inline-flex items-center gap-2 group/field rounded-md px-2 py-1 -mx-2 -my-1 hover:bg-army-gold/5 transition-colors"
       >
-        <span className={`font-mono text-sm transition-colors ${isRevealed ? 'text-army-dark' : 'text-army-dark/50 group-hover/field:text-army-dark'}`}>
+        <span className={`font-mono text-sm transition-colors ${isRevealed ? 'text-army-dark' : 'text-gray-400'}`}>
           {isRevealed ? value : maskSensitive(value)}
         </span>
         {isRevealed ? (
-          <Eye className="w-3.5 h-3.5 text-army-mid group-hover/field:text-army-dark transition-colors" />
+          <Eye className="w-3.5 h-3.5 text-army-mid opacity-50 group-hover/field:opacity-100 transition-opacity" />
         ) : (
-          <Lock className="w-3.5 h-3.5 text-army-gold/60 group-hover/field:text-army-gold transition-colors" />
+          <Lock className="w-3 h-3 text-army-gold/50 group-hover/field:text-army-gold transition-colors" />
         )}
       </button>
     )
@@ -95,147 +95,149 @@ function ProfilePage() {
     })
   }
 
-  const personalRows: { label: string; value: React.ReactNode }[] = [
-    { label: 'NIN', value: renderSensitiveField('nin', user.nin) },
-    { label: 'BVN', value: renderSensitiveField('bvn', user.bvn) },
-    { label: 'Full Name', value: user.name },
-    { label: 'Army Number', value: <span className="font-mono">{user.armyNumber}</span> },
-    { label: 'Salary Account No.', value: renderSensitiveField('salaryAccountNo', user.salaryAccountNo) },
-    { label: 'Date of Birth', value: formatDate(user.dateOfBirth) },
-    { label: 'Date of Enlistment', value: formatDate(user.dateOfEnlistment) },
-    { label: 'State of Origin', value: user.stateOfOrigin },
-    { label: 'Phone', value: user.phone },
-    { label: 'Unit', value: user.unit },
-    { label: 'Division', value: user.division },
-    { label: 'Corps', value: user.corps },
-  ]
-
   return (
     <div className="max-w-3xl mx-auto space-y-3">
-      {/* Hero — identity + service overview */}
-      <div className="bg-army-dark rounded-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-army/20 via-transparent to-army-gold/5" />
-        <div className="absolute -top-20 -right-20 w-56 h-56 bg-army-gold/6 rounded-full blur-[80px]" />
-
-        <div className="relative z-10 px-6 pt-6 pb-5">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 bg-linear-to-br from-army-mid to-army rounded-xl flex items-center justify-center text-white text-base font-bold ring-1 ring-white/10">
-              {user.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-            </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
-                {user.name}
-              </h1>
-              <p className="text-xs text-white/30 mt-0.5">
-                {user.rank} · {user.status === 'awol' ? 'AWOL' : 'Active Duty'} · {serviceYears}y {serviceMonths}m service
-              </p>
-            </div>
-          </div>
+      {/* Page header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-army-dark">{user.name}</h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            <span className="font-mono">{user.armyNumber}</span>
+            <span className="text-gray-300 mx-1.5">·</span>
+            {user.rank}
+            <span className="text-gray-300 mx-1.5">·</span>
+            {user.division}
+          </p>
         </div>
+        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full mt-1 ${
+          user.status === 'active' ? 'bg-green-50 text-green-700' :
+          user.status === 'awol' ? 'bg-red-50 text-red-700' :
+          user.status === 'retired' ? 'bg-gray-100 text-gray-600' :
+          'bg-orange-50 text-orange-700'
+        }`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${
+            user.status === 'active' ? 'bg-green-500' :
+            user.status === 'awol' ? 'bg-red-500' :
+            user.status === 'retired' ? 'bg-gray-400' :
+            'bg-orange-500'
+          }`} />
+          {user.status === 'awol' ? 'AWOL' : user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+        </span>
+      </div>
 
-        {/* Service detail chips */}
-        <div className="relative z-10 border-t border-white/8 px-6 py-3.5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {/* Service summary strip */}
+      <div className="bg-white rounded-xl border border-gray-100 px-5 py-3.5">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-x-6 gap-y-3">
           {[
-            { label: 'Rank / Grade', value: `${user.rank} – ${user.gradeLevel}` },
-            { label: 'Trade / Step', value: `${user.trade} – A${user.step}` },
+            { label: 'Rank', value: user.rank },
+            { label: 'Grade / Step', value: `${user.gradeLevel} – A${user.step}` },
+            { label: 'Trade', value: user.trade },
             { label: 'Corps', value: user.corps },
-            { label: 'Status', value: user.status === 'awol' ? 'AWOL' : user.status.charAt(0).toUpperCase() + user.status.slice(1) },
+            { label: 'Service', value: `${serviceYears}y ${serviceMonths}m` },
           ].map(({ label, value }) => (
             <div key={label} className="min-w-0">
-              <p className="text-[10px] text-white/25 uppercase tracking-wider font-medium mb-0.5">{label}</p>
-              <p className="text-[13px] text-white/80 font-semibold truncate">{value}</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">{label}</p>
+              <p className="text-sm text-army-dark font-semibold truncate">{value}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Personal Information */}
+      {/* Sensitive Identifiers */}
       <div className="bg-white rounded-xl border border-gray-100">
-        <div className="flex items-center justify-between px-5 pt-4 pb-2.5">
+        <div className="flex items-center justify-between px-5 pt-4 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-army-gold/8 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-army-gold" />
+              <Fingerprint className="w-4 h-4 text-army-gold" />
             </div>
-            <h2 className="text-sm font-bold text-army-dark">Personal Information</h2>
+            <div>
+              <h3 className="text-sm font-bold text-army-dark">Sensitive Identifiers</h3>
+              <p className="text-[11px] text-gray-400">Click any field to verify and reveal</p>
+            </div>
           </div>
-          <span className="text-[11px] text-gray-300 flex items-center gap-1.5">
-            <Lock className="w-3 h-3" />
-            Click to reveal sensitive fields
-          </span>
         </div>
-
-        <div className="px-3 pb-1">
-          {personalRows.map((row, i) => (
+        <div className="px-3 pb-3">
+          {([
+            { label: 'National Identification Number (NIN)', field: 'nin' as SensitiveField, value: user.nin },
+            { label: 'Bank Verification Number (BVN)', field: 'bvn' as SensitiveField, value: user.bvn },
+            { label: 'Salary Account Number', field: 'salaryAccountNo' as SensitiveField, value: user.salaryAccountNo },
+          ]).map((row, i, arr) => (
             <div
               key={row.label}
-              className={`flex items-center justify-between py-3 px-2 rounded-lg ${i < personalRows.length - 1 ? 'border-b border-gray-50' : ''}`}
+              className={`flex items-center justify-between py-3 px-2 ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}
             >
-              <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{row.label}</span>
-              <span className="text-sm text-army-dark font-medium text-right">{row.value}</span>
+              <span className="text-xs font-medium text-gray-400">{row.label}</span>
+              {renderSensitiveValue(row.field, row.value)}
             </div>
           ))}
         </div>
+      </div>
 
+      {/* Personal Information — 2-column grid */}
+      <div className="bg-white rounded-xl border border-gray-100">
+        <div className="flex items-center gap-2.5 px-5 pt-4 pb-3">
+          <div className="w-8 h-8 rounded-lg bg-army/8 flex items-center justify-center">
+            <Shield className="w-4 h-4 text-army" />
+          </div>
+          <h3 className="text-sm font-bold text-army-dark">Personal Information</h3>
+        </div>
+        <div className="px-5 pb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+            {([
+              { icon: Users, label: 'Full Name', value: user.name },
+              { icon: Hash, label: 'Army Number', value: user.armyNumber, mono: true },
+              { icon: Calendar, label: 'Date of Birth', value: formatDate(user.dateOfBirth) },
+              { icon: Calendar, label: 'Date of Enlistment', value: formatDate(user.dateOfEnlistment) },
+              { icon: MapPin, label: 'State of Origin', value: user.stateOfOrigin },
+              { icon: Phone, label: 'Phone', value: user.phone },
+            ]).map((row) => (
+              <div key={row.label} className="flex items-start gap-3 py-2">
+                <row.icon className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">{row.label}</p>
+                  <p className={`text-sm text-army-dark font-semibold truncate ${row.mono ? 'font-mono' : ''}`}>{row.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="border-t border-gray-100 px-5 py-3">
           <Link
             to="/complaints/new"
-            className="inline-flex items-center gap-2 text-xs text-army font-medium hover:text-army-gold transition-colors"
+            className="inline-flex items-center gap-2 text-xs text-army font-medium hover:text-army-gold transition-colors group"
           >
             <PenLine className="w-3 h-3" />
             To correct any personal information, raise a complaint ticket
+            <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-army-gold transition-colors" />
           </Link>
         </div>
       </div>
 
-      {/* Service Details */}
+      {/* Unit & Assignment */}
       <div className="bg-white rounded-xl border border-gray-100">
-        <div className="flex items-center gap-2.5 px-5 pt-4 pb-2.5">
+        <div className="flex items-center gap-2.5 px-5 pt-4 pb-3">
           <div className="w-8 h-8 rounded-lg bg-army/8 flex items-center justify-center">
-            <svg width="14" height="17" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 0L24 4V12C24 20 18 26 12 28C6 26 0 20 0 12V4L12 0Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" className="text-army" />
-              <path d="M12 7L13.76 11.24L18.4 11.76L15 14.84L15.92 19.4L12 17.2L8.08 19.4L9 14.84L5.6 11.76L10.24 11.24L12 7Z" fill="currentColor" className="text-army" />
-            </svg>
+            <Building2 className="w-4 h-4 text-army" />
           </div>
-          <h2 className="text-sm font-bold text-army-dark">Service Details</h2>
+          <h3 className="text-sm font-bold text-army-dark">Unit & Assignment</h3>
         </div>
-
-        <div className="px-3 pb-3">
-          {[
-            { label: 'Rank', value: user.rank },
-            { label: 'Grade Level', value: user.gradeLevel },
-            { label: 'Step', value: `A${user.step}` },
-            { label: 'Trade', value: user.trade },
-            {
-              label: 'Status',
-              value: null,
-              badge: true,
-            },
-          ].map((row, i, arr) => (
-            <div
-              key={row.label}
-              className={`flex items-center justify-between py-3 px-2 rounded-lg ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}
-            >
-              <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{row.label}</span>
-              {row.badge ? (
-                <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${
-                  user.status === 'active' ? 'bg-green-50 text-green-700' :
-                  user.status === 'awol' ? 'bg-red-50 text-red-700' :
-                  user.status === 'retired' ? 'bg-gray-100 text-gray-600' :
-                  'bg-orange-50 text-orange-700'
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                    user.status === 'active' ? 'bg-green-500' :
-                    user.status === 'awol' ? 'bg-red-500' :
-                    user.status === 'retired' ? 'bg-gray-400' :
-                    'bg-orange-500'
-                  }`} />
-                  {user.status === 'awol' ? 'AWOL' : user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                </span>
-              ) : (
-                <span className="text-sm text-army-dark font-semibold">{row.value}</span>
-              )}
-            </div>
-          ))}
+        <div className="px-5 pb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+            {([
+              { icon: Briefcase, label: 'Unit', value: user.unit },
+              { icon: Building2, label: 'Division', value: user.division },
+              { icon: Award, label: 'Corps', value: user.corps },
+              { icon: Shield, label: 'Trade', value: user.trade },
+            ]).map((row) => (
+              <div key={row.label} className="flex items-start gap-3 py-2">
+                <row.icon className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">{row.label}</p>
+                  <p className="text-sm text-army-dark font-semibold truncate">{row.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -270,8 +272,8 @@ function ProfilePage() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleDecryptSubmit()
               }}
-              placeholder="Enter 4-digit code"
-              className="w-full px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-army/20 focus:border-army transition-all"
+              placeholder="0000"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-lg text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-army/20 focus:border-army transition-all"
               autoFocus
             />
             {codeError && (
@@ -280,7 +282,7 @@ function ProfilePage() {
           </div>
           <DialogFooter>
             <Button onClick={handleDecryptSubmit} className="bg-army-dark text-white hover:bg-army transition-colors">
-              Verify
+              Verify & Reveal
             </Button>
           </DialogFooter>
         </DialogContent>
