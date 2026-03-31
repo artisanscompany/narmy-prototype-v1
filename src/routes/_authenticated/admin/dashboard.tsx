@@ -28,7 +28,7 @@ function AdminDashboard() {
   const kpis = isSuperAdmin ? KPI_DATA : DIVISION_1_KPI
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-full mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-army-dark">

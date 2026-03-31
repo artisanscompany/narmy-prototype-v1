@@ -36,29 +36,32 @@ function PersonnelDashboard() {
     <div className="max-w-6xl mx-auto">
       {user.status === 'awol' && <AWOLBanner />}
 
-      {/* Greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-army-dark">
-            {getGreeting()}, {user.rank} {user.name.split(' ').pop()}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Here's your service overview for {monthNames[new Date().getMonth() + 1]} {new Date().getFullYear()}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/pay">
-              <FileText className="w-4 h-4 mr-2" />
-              Download Payslip
-            </Link>
-          </Button>
-          <Button asChild className="bg-army-dark hover:bg-army">
-            <Link to="/complaints/new">
-              <Zap className="w-4 h-4 mr-2" />
-              Raise Complaint
-            </Link>
-          </Button>
+      {/* Hero Greeting */}
+      <div className="bg-gradient-to-br from-army-dark to-army rounded-2xl p-6 mb-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-army-gold/5 rounded-full blur-[80px]" />
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              {getGreeting()}, {user.rank} {user.name.split(' ').pop()}
+            </h1>
+            <p className="text-white/50 text-sm mt-1">
+              Here's your service overview for {monthNames[new Date().getMonth() + 1]} {new Date().getFullYear()}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild className="border-white/20 text-white hover:bg-white/10 hover:text-white">
+              <Link to="/pay">
+                <FileText className="w-4 h-4 mr-2" />
+                Download Payslip
+              </Link>
+            </Button>
+            <Button asChild className="bg-army-gold hover:bg-army-gold-light text-army-dark font-semibold">
+              <Link to="/complaints/new">
+                <Zap className="w-4 h-4 mr-2" />
+                Raise Complaint
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 
