@@ -2,10 +2,9 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useAuth } from '#/contexts/AuthContext'
 import { useData } from '#/contexts/DataContext'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { Button } from '#/components/ui/button'
 import { StatusBadge } from '#/components/status-badge'
 import { AWOLBanner } from '#/components/awol-banner'
-import { FileText, PenLine, Wallet, Shield, Star, AlertCircle } from 'lucide-react'
+import { FileText, PenLine, Wallet, Shield, Star, AlertCircle, ChevronRight, ArrowUpRight } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/_personnel/dashboard')({
   component: PersonnelDashboard,
@@ -40,164 +39,187 @@ function PersonnelDashboard() {
   const serviceMonths = totalMonths % 12
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {user.status === 'awol' && <AWOLBanner />}
 
       {/* Hero Greeting */}
-      <div className="bg-gradient-to-br from-army-dark to-army rounded-2xl p-6 mb-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-army-gold/5 rounded-full blur-[80px]" />
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              {getGreeting()}, {user.rank} {user.name.split(' ').pop()}
-            </h1>
-            <p className="text-white/50 text-sm mt-1">
-              Your {monthNames[new Date().getMonth() + 1]} {new Date().getFullYear()} service summary
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" asChild className="border-white/20 text-white hover:bg-white/10 hover:text-white">
-              <Link to="/pay">
-                <FileText className="w-4 h-4 mr-2" />
+      <div className="bg-gradient-to-r from-army-dark via-army-dark to-army rounded-2xl p-8 mb-6 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M30 5l5 15h16l-13 9 5 16-13-10-13 10 5-16-13-9h16z\' fill=\'%23C8A84B\' fill-opacity=\'1\'/%3E%3C/svg%3E")' }} />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-army-gold/8 rounded-full blur-[100px]" />
+        <div className="relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div>
+              <p className="text-army-gold/70 text-xs font-semibold uppercase tracking-[0.2em] mb-2">Personnel Dashboard</p>
+              <h1 className="text-3xl font-bold text-white leading-tight">
+                {getGreeting()}, {user.rank} {user.name.split(' ').pop()}
+              </h1>
+              <p className="text-white/40 text-sm mt-2">
+                {monthNames[new Date().getMonth() + 1]} {new Date().getFullYear()} service summary
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Link
+                to="/pay"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-semibold hover:bg-white/20 transition-all backdrop-blur-sm"
+              >
+                <FileText className="w-4 h-4" />
                 View Payslips
               </Link>
-            </Button>
-            <Button asChild className="bg-army-gold hover:bg-army-gold-light text-army-dark font-semibold">
-              <Link to="/complaints/new">
-                <PenLine className="w-4 h-4 mr-2" />
+              <Link
+                to="/complaints/new"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-army-gold text-army-dark text-sm font-bold hover:bg-army-gold-light transition-all shadow-lg shadow-army-gold/20"
+              >
+                <PenLine className="w-4 h-4" />
                 Raise Complaint
               </Link>
-            </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Status cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="relative overflow-hidden bg-army-gold/[0.02]">
-          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-army-gold to-army-gold/50" />
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Wallet className="w-4 h-4 text-army-gold" />
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Last Pay — {latestPayslip ? `${monthNamesShort[latestPayslip.month]} ${latestPayslip.year}` : ''}</span>
+      {/* Status cards — 2x2 grid that works at all widths */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
+          <div className="absolute top-0 left-0 w-1 h-full bg-army-gold" />
+          <CardContent className="pt-4 pb-4 pl-5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Wallet className="w-3.5 h-3.5 text-army-gold" />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Last Pay</span>
             </div>
-            <div className="text-2xl font-extrabold text-army-dark font-mono">
+            <div className="text-xl font-extrabold text-army-dark font-mono leading-tight">
               ₦{latestPayslip?.netPay.toLocaleString() ?? '—'}
             </div>
+            <div className="text-[11px] text-gray-400 mt-1">
+              {latestPayslip ? `${monthNamesShort[latestPayslip.month]} ${latestPayslip.year}` : ''}
+            </div>
             {latestPayslip?.status === 'paid' && (
-              <div className="text-xs text-green-600 mt-1 font-medium">✓ Paid {latestPayslip.paidDate?.slice(8, 10)} {latestPayslip ? monthNamesShort[latestPayslip.month] : ''}</div>
+              <div className="text-[11px] text-green-600 mt-0.5 font-semibold">Paid {latestPayslip.paidDate?.slice(8, 10)} {monthNamesShort[latestPayslip.month]}</div>
             )}
             {latestPayslip?.status === 'short-paid' && (
-              <div className="text-xs text-amber-600 mt-1 font-medium">⚠ Short-paid — discrepancy detected</div>
+              <div className="text-[11px] text-amber-600 mt-0.5 font-semibold">Short-paid</div>
             )}
           </CardContent>
         </Card>
 
-        <Card className={`relative overflow-hidden ${user.status === 'awol' ? 'bg-red-50/30' : 'bg-green-50/30'}`}>
-          <div className={`absolute top-0 left-0 right-0 h-[3px] ${user.status === 'awol' ? 'bg-gradient-to-r from-red-500 to-red-400' : 'bg-gradient-to-r from-green-500 to-green-400'}`} />
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="w-4 h-4 text-green-600" />
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Service Status</span>
+        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
+          <div className={`absolute top-0 left-0 w-1 h-full ${user.status === 'awol' ? 'bg-red-500' : 'bg-green-500'}`} />
+          <CardContent className="pt-4 pb-4 pl-5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Shield className={`w-3.5 h-3.5 ${user.status === 'awol' ? 'text-red-500' : 'text-green-500'}`} />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</span>
             </div>
-            <div className={`text-xl font-bold ${user.status === 'awol' ? 'text-red-600' : 'text-army-dark'}`}>
+            <div className={`text-lg font-bold leading-tight ${user.status === 'awol' ? 'text-red-600' : 'text-army-dark'}`}>
               {user.status === 'awol' ? 'AWOL' : 'Active Duty'}
             </div>
-            <div className="text-xs text-gray-400 mt-1">Enlisted {new Date(user.dateOfEnlistment).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            <div className="text-[11px] text-gray-400 mt-1">Enlisted {new Date(user.dateOfEnlistment).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-army/[0.02]">
-          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-army to-army-mid" />
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Star className="w-4 h-4 text-army" />
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Rank & Grade</span>
+        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
+          <div className="absolute top-0 left-0 w-1 h-full bg-army" />
+          <CardContent className="pt-4 pb-4 pl-5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Star className="w-3.5 h-3.5 text-army" />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rank</span>
             </div>
-            <div className="text-xl font-bold text-army-dark">{user.rank}</div>
-            <div className="text-xs text-gray-400 mt-1">{user.gradeLevel} · Step {user.step}</div>
-            <div className="mt-1"><span className="text-[10px] font-medium text-army bg-army/10 px-1.5 py-0.5 rounded">{user.corps}</span></div>
+            <div className="text-lg font-bold text-army-dark leading-tight">{user.rank}</div>
+            <div className="text-[11px] text-gray-400 mt-1">{user.gradeLevel} · Step {user.step}</div>
+            <span className="inline-block mt-1 text-[10px] font-semibold text-army bg-army/8 px-2 py-0.5 rounded-full">{user.corps}</span>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-amber-50/30">
-          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-300" />
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertCircle className="w-4 h-4 text-amber-500" />
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Open Complaints</span>
+        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
+          <div className={`absolute top-0 left-0 w-1 h-full ${openComplaints.length > 0 ? 'bg-amber-400' : 'bg-gray-300'}`} />
+          <CardContent className="pt-4 pb-4 pl-5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <AlertCircle className={`w-3.5 h-3.5 ${openComplaints.length > 0 ? 'text-amber-500' : 'text-gray-400'}`} />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Complaints</span>
             </div>
-            <div className="text-2xl font-extrabold text-army-dark">{openComplaints.length}</div>
-            {latestComplaint && !['resolved', 'closed'].includes(latestComplaint.status) && (
-              <div className="text-xs text-amber-600 mt-1 font-medium">
-                {openComplaints.length} {latestComplaint.status === 'under-review' ? 'under review' : latestComplaint.status === 'escalated' ? 'escalated' : 'pending'}
-              </div>
-            )}
+            <div className="text-xl font-extrabold text-army-dark leading-tight">{openComplaints.length}</div>
+            <div className="text-[11px] text-gray-400 mt-1">
+              {openComplaints.length === 0 ? 'No open complaints' : `${openComplaints.length} open`}
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Two column: Pay + Details/Complaint */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base">Pay Breakdown — {latestPayslip ? `${monthNames[latestPayslip.month]} ${latestPayslip.year}` : ''}</CardTitle>
-            <Link to="/pay" className="text-xs text-army-gold font-semibold hover:underline">All payslips →</Link>
+            <CardTitle className="text-sm font-bold text-army-dark">Pay Breakdown — {latestPayslip ? `${monthNames[latestPayslip.month]} ${latestPayslip.year}` : ''}</CardTitle>
+            <Link to="/pay" className="inline-flex items-center gap-1 text-xs text-army-gold font-semibold hover:underline">
+              All payslips <ArrowUpRight className="w-3 h-3" />
+            </Link>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {latestPayslip?.components.map((comp) => (
-              <div key={comp.label} className="flex justify-between items-center px-3 py-2.5 bg-gray-50 rounded-lg">
-                <span className={`text-sm ${comp.type === 'deduction' ? 'text-red-600' : 'text-gray-700'}`}>{comp.label}</span>
-                <span className={`text-sm font-bold font-mono ${comp.type === 'deduction' ? 'text-red-600' : 'text-army-dark'}`}>
-                  {comp.type === 'deduction' ? '-' : ''}₦{comp.amount.toLocaleString()}
-                </span>
+          <CardContent className="space-y-1.5">
+            {latestPayslip?.components.filter(c => c.type !== 'deduction').map((comp) => (
+              <div key={comp.label} className="flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <span className="text-sm text-gray-600">{comp.label}</span>
+                <span className="text-sm font-bold font-mono text-army-dark">₦{comp.amount.toLocaleString()}</span>
               </div>
             ))}
-            <div className="flex justify-between items-center px-3 py-3 bg-army-dark rounded-lg mt-2">
-              <span className="text-base font-semibold text-white">Net Pay</span>
+            <div className="border-t border-dashed border-gray-200 my-1" />
+            {latestPayslip?.components.filter(c => c.type === 'deduction').map((comp) => (
+              <div key={comp.label} className="flex justify-between items-center px-3 py-2 rounded-lg hover:bg-red-50/50 transition-colors">
+                <span className="text-sm text-red-500">{comp.label}</span>
+                <span className="text-sm font-bold font-mono text-red-500">-₦{comp.amount.toLocaleString()}</span>
+              </div>
+            ))}
+            <div className="flex justify-between items-center px-4 py-3.5 bg-army-dark rounded-xl mt-2">
+              <span className="text-sm font-semibold text-white/80">Net Pay</span>
               <span className="text-xl font-extrabold text-army-gold font-mono">₦{latestPayslip?.netPay.toLocaleString()}</span>
             </div>
           </CardContent>
         </Card>
 
         <div className="lg:col-span-2 space-y-4">
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Service Details</CardTitle>
+              <CardTitle className="text-sm font-bold text-army-dark">Service Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-0 divide-y divide-gray-100">
               {[
                 ['Army Number', user.armyNumber],
                 ['Division', user.division],
                 ['Trade', user.trade],
-                ['Years of Service', `${serviceYears} yrs ${serviceMonths} mos`],
+                ['Service', `${serviceYears} yrs ${serviceMonths} mos`],
               ].map(([label, value]) => (
-                <div key={label} className="flex justify-between py-2">
-                  <span className="text-xs text-gray-500">{label}</span>
-                  <span className="text-xs font-semibold text-army-dark font-mono">{value}</span>
+                <div key={label} className="flex justify-between py-2.5">
+                  <span className="text-xs text-gray-400">{label}</span>
+                  <span className="text-xs font-bold text-army-dark font-mono">{value}</span>
                 </div>
               ))}
             </CardContent>
           </Card>
 
           {latestComplaint && (
-            <Card>
+            <Card className="border-0 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Latest Complaint</CardTitle>
+                <CardTitle className="text-sm font-bold text-army-dark">Latest Complaint</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`p-3 rounded-lg border ${latestComplaint.status === 'resolved' || latestComplaint.status === 'closed' ? 'bg-green-50 border-green-200' : latestComplaint.status === 'escalated' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
-                  <div className="flex justify-between items-center mb-1">
+                <Link
+                  to="/complaints/$complaintId"
+                  params={{ complaintId: latestComplaint.id }}
+                  className="block p-4 rounded-xl border border-gray-100 hover:border-army-gold/30 hover:shadow-sm transition-all group"
+                >
+                  <div className="flex justify-between items-center mb-2">
                     <StatusBadge status={latestComplaint.status} />
-                    <span className="text-[10px] text-gray-400 font-mono">{latestComplaint.id}</span>
+                    <span className="text-[10px] text-gray-300 font-mono">{latestComplaint.id}</span>
                   </div>
-                  <p className="text-sm font-semibold text-gray-700 mt-2">{latestComplaint.subcategory}</p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-sm font-bold text-army-dark mt-2 group-hover:text-army">{latestComplaint.subcategory}</p>
+                  <p className="text-[11px] text-gray-400 mt-1">
                     Filed {new Date(latestComplaint.filedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {latestComplaint.category}
                   </p>
-                </div>
+                  <div className="flex items-center gap-1 mt-3 text-army-gold text-xs font-semibold">
+                    View details <ChevronRight className="w-3 h-3" />
+                  </div>
+                </Link>
                 <div className="text-right mt-3">
-                  <Link to="/complaints" className="text-xs text-army-gold font-semibold hover:underline">All complaints →</Link>
+                  <Link to="/complaints" className="inline-flex items-center gap-1 text-xs text-army-gold font-semibold hover:underline">
+                    All complaints <ArrowUpRight className="w-3 h-3" />
+                  </Link>
                 </div>
               </CardContent>
             </Card>
