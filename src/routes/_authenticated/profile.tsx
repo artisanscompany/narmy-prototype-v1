@@ -27,6 +27,9 @@ const FIELD_LABELS: Record<SensitiveField, string> = {
   salaryAccountNo: 'Salary Account Number',
 }
 
+// TODO: replace with real auth flow
+const DEMO_DECRYPT_PIN = '0000'
+
 const statusStyles: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200',
   awol: 'bg-red-50 text-red-700 border-red-200',
@@ -44,7 +47,7 @@ function ProfilePage() {
   if (!user) return null
 
   function handleDecryptSubmit() {
-    if (code === '0000') {
+    if (code === DEMO_DECRYPT_PIN) {
       setRevealedFields((prev) => {
         const next = new Set(prev)
         next.add(decryptField!)
@@ -64,7 +67,9 @@ function ProfilePage() {
       <button
         type="button"
         onClick={() => {
-          if (!isRevealed) {
+          if (isRevealed) {
+            setRevealedFields((prev) => { const next = new Set(prev); next.delete(field); return next })
+          } else {
             setDecryptField(field)
             setCode('')
             setCodeError(false)
