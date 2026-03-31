@@ -61,7 +61,7 @@ export function AppSidebar() {
                 const isActive = matchRoute({ to: item.to, fuzzy: true })
                 return (
                   <SidebarMenuItem key={item.to}>
-                    <SidebarMenuButton asChild isActive={!!isActive} className={isActive ? 'bg-white/[0.12] text-white font-semibold border-l-2 border-army-gold' : 'text-white/60 hover:text-white hover:bg-white/[0.06]'}>
+                    <SidebarMenuButton asChild isActive={!!isActive} className={isActive ? 'bg-white/[0.12] text-white font-semibold' : 'text-white/60 hover:text-white hover:bg-white/[0.06]'}>
                       <Link to={item.to} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150">
                         <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-army-gold' : ''}`} />
                         <span className="text-[13px] flex-1">{item.label}</span>

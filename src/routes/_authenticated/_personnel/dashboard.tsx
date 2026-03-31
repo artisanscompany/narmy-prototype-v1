@@ -79,9 +79,8 @@ function PersonnelDashboard() {
 
       {/* Status cards — 2x2 grid that works at all widths */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
-          <div className="absolute top-0 left-0 w-1 h-full bg-army-gold" />
-          <CardContent className="pt-4 pb-4 pl-5">
+        <Card className="border-0 shadow-sm bg-white">
+          <CardContent className="pt-4 pb-4 px-4">
             <div className="flex items-center gap-2 mb-1.5">
               <Wallet className="w-3.5 h-3.5 text-army-gold" />
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Last Pay</span>
@@ -101,9 +100,8 @@ function PersonnelDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
-          <div className={`absolute top-0 left-0 w-1 h-full ${user.status === 'awol' ? 'bg-red-500' : 'bg-green-500'}`} />
-          <CardContent className="pt-4 pb-4 pl-5">
+        <Card className="border-0 shadow-sm bg-white">
+          <CardContent className="pt-4 pb-4 px-4">
             <div className="flex items-center gap-2 mb-1.5">
               <Shield className={`w-3.5 h-3.5 ${user.status === 'awol' ? 'text-red-500' : 'text-green-500'}`} />
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</span>
@@ -115,9 +113,8 @@ function PersonnelDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
-          <div className="absolute top-0 left-0 w-1 h-full bg-army" />
-          <CardContent className="pt-4 pb-4 pl-5">
+        <Card className="border-0 shadow-sm bg-white">
+          <CardContent className="pt-4 pb-4 px-4">
             <div className="flex items-center gap-2 mb-1.5">
               <Star className="w-3.5 h-3.5 text-army" />
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rank</span>
@@ -128,9 +125,8 @@ function PersonnelDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-0 shadow-sm bg-white">
-          <div className={`absolute top-0 left-0 w-1 h-full ${openComplaints.length > 0 ? 'bg-amber-400' : 'bg-gray-300'}`} />
-          <CardContent className="pt-4 pb-4 pl-5">
+        <Card className="border-0 shadow-sm bg-white">
+          <CardContent className="pt-4 pb-4 px-4">
             <div className="flex items-center gap-2 mb-1.5">
               <AlertCircle className={`w-3.5 h-3.5 ${openComplaints.length > 0 ? 'text-amber-500' : 'text-gray-400'}`} />
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Complaints</span>

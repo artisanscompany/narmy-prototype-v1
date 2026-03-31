@@ -20,12 +20,6 @@ const filterOptions: { label: string; value: ComplaintStatus | 'all' }[] = [
   { label: 'Resolved', value: 'resolved' },
 ]
 
-const statusBorderColor: Record<string, string> = {
-  submitted: 'border-l-gray-400',
-  'under-review': 'border-l-amber-400',
-  escalated: 'border-l-red-500',
-  resolved: 'border-l-green-500',
-}
 
 function ComplaintsListPage() {
   const { user } = useAuth()
@@ -83,7 +77,7 @@ function ComplaintsListPage() {
                   key={c.id}
                   to="/complaints/$complaintId"
                   params={{ complaintId: c.id }}
-                  className={`flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors border-l-4 ${statusBorderColor[c.status] ?? 'border-l-gray-200'}`}
+                  className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-1">
