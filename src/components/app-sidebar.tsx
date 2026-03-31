@@ -4,13 +4,14 @@ import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent,
   SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter,
 } from '#/components/ui/sidebar'
-import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, Users, Shield, LogOut } from 'lucide-react'
+import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, Users, Shield, LogOut, UserRound } from 'lucide-react'
 
 const personnelItems = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Pay & Documents', to: '/pay', icon: Wallet },
   { label: 'Complaints', to: '/complaints', icon: MessageCircle },
   { label: 'Help & Support', to: '/help', icon: HelpCircle },
+  { label: 'Profile', to: '/profile', icon: UserRound },
 ]
 
 const adminItems = [
@@ -19,6 +20,7 @@ const adminItems = [
   { label: 'Analytics', to: '/admin/analytics', icon: BarChart3 },
   { label: 'User Management', to: '/admin/users', icon: Users },
   { label: 'RBAC Matrix', to: '/admin/rbac', icon: Shield },
+  { label: 'Profile', to: '/profile', icon: UserRound },
 ]
 
 export function AppSidebar() {
