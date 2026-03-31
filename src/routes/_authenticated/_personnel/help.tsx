@@ -17,17 +17,17 @@ const faqs = [
 ]
 
 const channels = [
-  { icon: Phone, label: 'Help Desk', description: '24/7 phone support for urgent issues', action: '0800-ARMY-HELP', actionLabel: 'Call Now' },
-  { icon: MessageCircle, label: 'WhatsApp', description: 'Quick support via WhatsApp', action: 'https://wa.me/2348001234567', actionLabel: 'Chat Now' },
-  { icon: Mail, label: 'Email', description: 'For detailed inquiries and documentation', action: 'mailto:support@narmy.mil.ng', actionLabel: 'Send Email' },
+  { icon: Phone, label: 'Help Desk', description: 'Available 24/7 for urgent matters', contact: '0800-ARMY-HELP', action: '0800-ARMY-HELP', actionLabel: 'Call Now' },
+  { icon: MessageCircle, label: 'WhatsApp', description: 'Chat with support on WhatsApp', contact: '+234 800 123 4567', action: 'https://wa.me/2348001234567', actionLabel: 'Chat Now' },
+  { icon: Mail, label: 'Email', description: 'For formal correspondence', contact: 'support@narmy.mil.ng', action: 'mailto:support@narmy.mil.ng', actionLabel: 'Send Email' },
 ]
 
 function HelpPage() {
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-army-dark">Help & Support</h1>
-        <p className="text-gray-500 text-sm mt-1">Find answers or contact support</p>
+        <h1 className="text-2xl font-bold text-army-dark">Help Centre</h1>
+        <p className="text-gray-500 text-sm mt-1">Get help with your service portal questions</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -38,7 +38,8 @@ function HelpPage() {
                 <ch.icon className="w-5 h-5 text-army" />
               </div>
               <h3 className="font-semibold text-army-dark text-sm">{ch.label}</h3>
-              <p className="text-xs text-gray-500 mt-1 mb-3">{ch.description}</p>
+              <p className="text-xs text-gray-500 mt-1 mb-2">{ch.description}</p>
+              <p className="text-xs font-mono text-gray-600 mb-3">{ch.contact}</p>
               <a
                 href={ch.action.startsWith('http') || ch.action.startsWith('mailto') ? ch.action : `tel:${ch.action}`}
                 className="inline-block px-4 py-2 bg-army-dark text-white text-xs font-semibold rounded-lg hover:bg-army transition-colors"
@@ -52,10 +53,13 @@ function HelpPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <h2 className="text-base font-bold text-army-dark mb-4">Frequently Asked Questions</h2>
+          <div className="flex items-baseline gap-2 mb-4">
+            <h2 className="text-base font-bold text-army-dark">Frequently Asked Questions</h2>
+            <span className="text-xs text-gray-400">({faqs.length} articles)</span>
+          </div>
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, i) => (
-              <AccordionItem key={i} value={`faq-${i}`}>
+              <AccordionItem key={i} value={`faq-${i}`} className="border rounded-lg px-3 mb-2">
                 <AccordionTrigger className="text-sm font-medium text-army-dark">{faq.q}</AccordionTrigger>
                 <AccordionContent className="text-sm text-gray-600">{faq.a}</AccordionContent>
               </AccordionItem>
