@@ -1,0 +1,82 @@
+<h2>Section 1: Login Screen</h2>
+<p class="subtitle">The first impression — military-formal but modern and polished</p>
+
+<div class="mockup">
+  <div class="mockup-header">Login Screen — Desktop</div>
+  <div class="mockup-body" style="background: #0B2E1A; min-height: 500px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+
+    <!-- Subtle background pattern -->
+    <div style="position: absolute; inset: 0; opacity: 0.03; background-image: repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(200,168,75,0.3) 40px, rgba(200,168,75,0.3) 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(200,168,75,0.3) 40px, rgba(200,168,75,0.3) 41px);"></div>
+
+    <!-- Top bar -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; padding: 12px 24px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(200,168,75,0.15);">
+      <div style="width: 32px; height: 32px; background: #C8A84B; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+        <span style="color: #0B2E1A; font-size: 16px; font-weight: 800;">★</span>
+      </div>
+      <span style="color: white; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;">NIGERIAN ARMY — PERSONNEL SELF-SERVICE PORTAL</span>
+    </div>
+
+    <!-- Login card -->
+    <div style="background: white; border-radius: 16px; padding: 40px 36px; width: 420px; box-shadow: 0 25px 60px rgba(0,0,0,0.4); position: relative;">
+
+      <!-- Gold accent line at top -->
+      <div style="position: absolute; top: 0; left: 32px; right: 32px; height: 3px; background: linear-gradient(90deg, transparent, #C8A84B, transparent); border-radius: 0 0 2px 2px;"></div>
+
+      <!-- Shield icon -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #C8A84B, #D4B85C); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(200,168,75,0.3);">
+          <span style="color: #0B2E1A; font-size: 24px; font-weight: 800;">★</span>
+        </div>
+      </div>
+
+      <h3 style="text-align: center; color: #0B2E1A; font-size: 20px; margin: 0 0 4px 0;">Personnel Portal</h3>
+      <p style="text-align: center; color: #6b7280; font-size: 13px; margin: 0 0 28px 0;">Nigerian Army — Secure Access</p>
+
+      <p style="color: #4b5563; font-size: 13px; margin-bottom: 20px;">Enter your two unique identifiers to sign in.</p>
+
+      <!-- Army Number field -->
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Army Number</label>
+        <div style="display: flex; align-items: center; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 10px 14px; background: #f9fafb;">
+          <span style="color: #9ca3af; margin-right: 10px; font-size: 14px;">#</span>
+          <span style="color: #9ca3af; font-size: 14px; font-family: monospace;">e.g. NA/23/01234</span>
+        </div>
+      </div>
+
+      <!-- Salary Account field -->
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Salary Account Number</label>
+        <div style="display: flex; align-items: center; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 10px 14px; background: #f9fafb;">
+          <span style="color: #9ca3af; margin-right: 10px; font-size: 14px;">🔒</span>
+          <span style="color: #9ca3af; font-size: 14px; font-family: monospace;">e.g. SAL-001-2024</span>
+          <span style="color: #9ca3af; margin-left: auto; font-size: 14px;">👁</span>
+        </div>
+      </div>
+
+      <!-- Sign in button -->
+      <div style="background: linear-gradient(135deg, #1B5E35, #2E7D4F); color: white; text-align: center; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(27,94,53,0.3);">
+        Sign In
+      </div>
+
+      <p style="text-align: center; color: #9ca3af; font-size: 11px; margin-top: 20px;">For access issues, contact your Division Admin or call the Help Desk</p>
+    </div>
+
+    <!-- Footer -->
+    <div style="position: absolute; bottom: 16px; text-align: center; width: 100%;">
+      <span style="color: rgba(255,255,255,0.4); font-size: 12px;">Prototype v1.0 — For review purposes only</span>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>Design Decisions</h3>
+  <ul style="color: #cbd5e1; line-height: 1.8;">
+    <li><strong>Gold accent line</strong> on the card top — subtle premium touch over the reference</li>
+    <li><strong>Rounded square shield icon</strong> instead of circle — more modern, aligns with shadcn's design language</li>
+    <li><strong>Gradient sign-in button</strong> — depth and polish over flat green</li>
+    <li><strong>Subtle grid pattern</strong> on background — military precision aesthetic without being heavy</li>
+    <li><strong>Monospace font</strong> for input placeholders — reinforces the "system identifier" feel</li>
+    <li><strong>Error state</strong> will shake the card gently + show red inline message below fields</li>
+    <li><strong>Successful login</strong> triggers a brief loading spinner, then redirects based on role</li>
+  </ul>
+</div>

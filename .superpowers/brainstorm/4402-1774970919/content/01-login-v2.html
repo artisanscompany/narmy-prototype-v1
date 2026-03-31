@@ -1,0 +1,236 @@
+<h2>Login Screen — Elevated v2</h2>
+<p class="subtitle">Fortune 500 agency quality — two directions</p>
+
+<div class="cards">
+
+  <!-- Option A: Split-screen cinematic -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="min-height: 620px; display: flex; background: #050f08; position: relative; overflow: hidden; border-radius: 8px;">
+
+        <!-- LEFT PANEL: Cinematic brand panel -->
+        <div style="width: 55%; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+
+          <!-- Layered gradient background -->
+          <div style="position: absolute; inset: 0; background: linear-gradient(160deg, #0a1f12 0%, #0B2E1A 30%, #143d22 60%, #1B5E35 100%);"></div>
+
+          <!-- Diagonal gold accent -->
+          <div style="position: absolute; top: -50%; right: -10%; width: 200px; height: 200%; background: linear-gradient(180deg, transparent, rgba(200,168,75,0.06), transparent); transform: rotate(15deg);"></div>
+          <div style="position: absolute; top: -50%; right: 5%; width: 1px; height: 200%; background: linear-gradient(180deg, transparent, rgba(200,168,75,0.15), transparent); transform: rotate(15deg);"></div>
+
+          <!-- Topographic pattern -->
+          <div style="position: absolute; inset: 0; opacity: 0.04; background: repeating-conic-gradient(rgba(200,168,75,0.5) 0% 25%, transparent 0% 50%) 0 0 / 60px 60px;"></div>
+
+          <!-- Top: Logo and title -->
+          <div style="position: relative; z-index: 2; padding: 40px 44px 0;">
+            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 60px;">
+              <div style="width: 44px; height: 44px; border: 2px solid #C8A84B; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(200,168,75,0.08);">
+                <span style="color: #C8A84B; font-size: 20px; font-weight: 800;">★</span>
+              </div>
+              <div>
+                <div style="color: #C8A84B; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">Nigerian Army</div>
+              </div>
+            </div>
+
+            <h1 style="color: white; font-size: 36px; font-weight: 300; line-height: 1.25; margin: 0 0 16px 0; letter-spacing: -0.5px;">
+              Personnel<br>
+              <span style="font-weight: 700;">Self-Service Portal</span>
+            </h1>
+            <p style="color: rgba(255,255,255,0.45); font-size: 15px; line-height: 1.6; max-width: 340px; margin: 0;">
+              Secure access to your service records, pay information, and support resources.
+            </p>
+          </div>
+
+          <!-- Bottom: Trust indicators -->
+          <div style="position: relative; z-index: 2; padding: 0 44px 40px;">
+            <div style="border-top: 1px solid rgba(200,168,75,0.12); padding-top: 24px; display: flex; gap: 32px;">
+              <div>
+                <div style="color: #C8A84B; font-size: 22px; font-weight: 700;">250K+</div>
+                <div style="color: rgba(255,255,255,0.35); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">Personnel Served</div>
+              </div>
+              <div>
+                <div style="color: #C8A84B; font-size: 22px; font-weight: 700;">8</div>
+                <div style="color: rgba(255,255,255,0.35); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">Divisions</div>
+              </div>
+              <div>
+                <div style="color: #C8A84B; font-size: 22px; font-weight: 700;">99.9%</div>
+                <div style="color: rgba(255,255,255,0.35); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">Uptime SLA</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: Login form -->
+        <div style="width: 45%; background: #FAFAF8; display: flex; flex-direction: column; justify-content: center; padding: 48px 44px; position: relative;">
+
+          <!-- Subtle top accent -->
+          <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #C8A84B, #1B5E35);"></div>
+
+          <div style="max-width: 340px; margin: 0 auto; width: 100%;">
+            <h2 style="color: #0B2E1A; font-size: 22px; font-weight: 700; margin: 0 0 4px 0;">Welcome back</h2>
+            <p style="color: #6b7280; font-size: 13px; margin: 0 0 32px 0;">Sign in with your service credentials</p>
+
+            <!-- Army Number -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 8px;">Army Number</label>
+              <div style="border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; background: white; display: flex; align-items: center; transition: all 0.2s;">
+                <span style="color: #C8A84B; margin-right: 12px; font-size: 14px; font-weight: 600;">#</span>
+                <span style="color: #9ca3af; font-size: 14px; font-family: 'SF Mono', 'Fira Code', monospace;">NA/23/01234</span>
+              </div>
+            </div>
+
+            <!-- Salary Account -->
+            <div style="margin-bottom: 28px;">
+              <label style="display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 8px;">Salary Account Number</label>
+              <div style="border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; background: white; display: flex; align-items: center;">
+                <span style="color: #C8A84B; margin-right: 12px; font-size: 14px;">🔒</span>
+                <span style="color: #9ca3af; font-size: 14px; font-family: 'SF Mono', 'Fira Code', monospace;">•••••••••••</span>
+                <span style="color: #9ca3af; margin-left: auto; cursor: pointer; font-size: 13px;">👁</span>
+              </div>
+            </div>
+
+            <!-- Sign in button -->
+            <div style="background: #0B2E1A; color: white; text-align: center; padding: 13px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 6px 16px rgba(11,46,26,0.2); letter-spacing: 0.3px;">
+              Sign In →
+            </div>
+
+            <div style="margin-top: 24px; padding: 16px; background: rgba(200,168,75,0.06); border-radius: 10px; border: 1px solid rgba(200,168,75,0.12);">
+              <p style="color: #6b7280; font-size: 11px; margin: 0; line-height: 1.5;">
+                <span style="color: #C8A84B; font-weight: 600;">Need help?</span> Contact your Division Admin or call the 24/7 Help Desk at <span style="font-weight: 600; color: #374151;">0800-ARMY-HELP</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Split-Screen Cinematic</h3>
+      <p>Brand storytelling on the left, focused login on the right. Trust indicators (personnel count, divisions, uptime) reinforce credibility. Premium agency feel — similar to Stripe, Linear, or banking portals. Gold + green gradient accent bridges the two panels.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Centered card with immersive backdrop -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="min-height: 620px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-radius: 8px; background: #060d09;">
+
+        <!-- Radial gradient backdrop -->
+        <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 20%, rgba(27,94,53,0.25) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(200,168,75,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #0B2E1A 0%, #050f08 100%);"></div>
+
+        <!-- Animated gradient orbs -->
+        <div style="position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(27,94,53,0.15), transparent 70%); top: -100px; left: -100px; filter: blur(40px);"></div>
+        <div style="position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(200,168,75,0.08), transparent 70%); bottom: -50px; right: -50px; filter: blur(40px);"></div>
+
+        <!-- Top bar -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; z-index: 5;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border: 1.5px solid rgba(200,168,75,0.4); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+              <span style="color: #C8A84B; font-size: 16px; font-weight: 800;">★</span>
+            </div>
+            <span style="color: rgba(255,255,255,0.7); font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Nigerian Army</span>
+          </div>
+          <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Secure Portal v1.0</span>
+        </div>
+
+        <!-- Main card -->
+        <div style="position: relative; z-index: 3; width: 440px;">
+          <!-- Glass card -->
+          <div style="background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); border-radius: 20px; padding: 44px 40px; box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 30px 80px rgba(0,0,0,0.5), 0 0 120px rgba(200,168,75,0.05);">
+
+            <!-- Centered header -->
+            <div style="text-align: center; margin-bottom: 32px;">
+              <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #0B2E1A, #1B5E35); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(11,46,26,0.2);">
+                <span style="color: #C8A84B; font-size: 28px; font-weight: 800;">★</span>
+              </div>
+              <h2 style="color: #0B2E1A; font-size: 24px; font-weight: 700; margin: 0 0 6px 0;">Personnel Portal</h2>
+              <p style="color: #6b7280; font-size: 13px; margin: 0;">Enter your service credentials to continue</p>
+            </div>
+
+            <!-- Army Number -->
+            <div style="margin-bottom: 18px;">
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                <span>Army Number</span>
+                <span style="font-weight: 400; color: #9ca3af; font-size: 11px;">Required</span>
+              </label>
+              <div style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 13px 16px; background: #FAFAF8; display: flex; align-items: center;">
+                <div style="width: 28px; height: 28px; background: rgba(200,168,75,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                  <span style="color: #C8A84B; font-size: 13px; font-weight: 700;">#</span>
+                </div>
+                <span style="color: #9ca3af; font-size: 14px; font-family: 'SF Mono', monospace;">NA/23/01234</span>
+              </div>
+            </div>
+
+            <!-- Salary Account -->
+            <div style="margin-bottom: 28px;">
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                <span>Salary Account Number</span>
+                <span style="font-weight: 400; color: #9ca3af; font-size: 11px;">Required</span>
+              </label>
+              <div style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 13px 16px; background: #FAFAF8; display: flex; align-items: center;">
+                <div style="width: 28px; height: 28px; background: rgba(200,168,75,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                  <span style="color: #C8A84B; font-size: 13px;">🔒</span>
+                </div>
+                <span style="color: #9ca3af; font-size: 14px; font-family: 'SF Mono', monospace;">•••••••••••</span>
+                <div style="margin-left: auto; width: 28px; height: 28px; background: rgba(0,0,0,0.03); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                  <span style="font-size: 13px;">👁</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sign in button -->
+            <div style="background: linear-gradient(135deg, #0B2E1A 0%, #1B5E35 100%); color: white; text-align: center; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05), 0 8px 24px rgba(11,46,26,0.25); letter-spacing: 0.3px; position: relative; overflow: hidden;">
+              <span style="position: relative; z-index: 1;">Sign In</span>
+            </div>
+
+            <!-- Divider -->
+            <div style="display: flex; align-items: center; margin: 24px 0 20px; gap: 12px;">
+              <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
+              <span style="color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Need assistance?</span>
+              <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
+            </div>
+
+            <!-- Help options -->
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1; padding: 10px; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; font-size: 12px; color: #374151; font-weight: 500; background: white;">
+                📞 Help Desk
+              </div>
+              <div style="flex: 1; padding: 10px; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; font-size: 12px; color: #374151; font-weight: 500; background: white;">
+                💬 WhatsApp
+              </div>
+              <div style="flex: 1; padding: 10px; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; font-size: 12px; color: #374151; font-weight: 500; background: white;">
+                📧 Email
+              </div>
+            </div>
+          </div>
+
+          <!-- Security badge below card -->
+          <div style="text-align: center; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span style="color: rgba(200,168,75,0.5); font-size: 12px;">🔒</span>
+            <span style="color: rgba(255,255,255,0.3); font-size: 11px;">256-bit SSL encrypted · Defence-grade security</span>
+          </div>
+        </div>
+
+        <!-- Bottom -->
+        <div style="position: absolute; bottom: 20px; text-align: center; width: 100%;">
+          <span style="color: rgba(255,255,255,0.2); font-size: 11px;">Prototype v1.0 — For review purposes only</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Immersive Centered Card</h3>
+      <p>Atmospheric dark backdrop with layered radial gradients and soft light orbs. Elevated card with premium shadow depth, icon pills on inputs, and integrated help options (phone, WhatsApp, email) below the form. Security badge at bottom. More dramatic, less corporate — commands authority.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>What's different from the competition</h3>
+  <ul style="color: #cbd5e1; line-height: 2;">
+    <li><strong>Layered depth</strong> — multiple gradient layers, soft glows, and shadow systems vs flat green background</li>
+    <li><strong>Input field icons in pills</strong> — contained, purposeful design vs bare inline icons</li>
+    <li><strong>Help access built into login</strong> — three clear support channels, not hidden in footer text</li>
+    <li><strong>Security trust signals</strong> — encryption badge, "Required" labels, professional form UX</li>
+    <li><strong>Typography hierarchy</strong> — clear weight progression, measured spacing, intentional letter-spacing</li>
+    <li><strong>Motion</strong> (in implementation) — entrance animations, input focus transitions, button hover states, loading state</li>
+  </ul>
+</div>
