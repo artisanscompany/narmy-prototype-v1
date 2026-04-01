@@ -51,10 +51,12 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-0.5">
-              {items.map((item) => {
+              {items.map((item, i) => {
                 const isActive = matchRoute({ to: item.to, fuzzy: true })
+                const isLast = i === items.length - 1
                 return (
                   <SidebarMenuItem key={item.to}>
+                    {isLast && <div className="h-px bg-white/[0.06] mx-2 my-1.5" />}
                     <SidebarMenuButton asChild isActive={!!isActive} className={isActive ? 'bg-white/[0.12] text-white font-semibold' : 'text-white/50 hover:text-white hover:bg-white/[0.06]'}>
                       <Link to={item.to} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 relative">
                         {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-army-gold" />}
