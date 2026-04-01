@@ -7,7 +7,7 @@ import { loadFromStorage, saveToStorage } from '#/lib/localStorage'
 import type { Complaint, ComplaintStatus, TimelineEvent, Attachment } from '#/types/complaint'
 import type { CourseProgress } from '#/types/elearning'
 import type { Payslip } from '#/types/payslip'
-import type { User, UserRole } from '#/types/user'
+import type { User, UserRole, ServiceStatus } from '#/types/user'
 
 interface DataContextValue {
   complaints: Complaint[]
@@ -18,6 +18,9 @@ interface DataContextValue {
   updateComplaintStatus: (complaintId: string, newStatus: ComplaintStatus, actor: string, note: string) => void
   addNote: (complaintId: string, note: string, actor: string, attachments?: Attachment[]) => void
   updateUserRole: (userId: string, newRole: UserRole) => void
+  addPayslip: (payslip: Payslip) => void
+  updatePayslip: (payslipId: string, updates: Partial<Payslip>) => void
+  updateUserStatus: (userId: string, newStatus: ServiceStatus) => void
   getComplaintsForUser: (userId: string) => Complaint[]
   getComplaintsForDivision: (division: string) => Complaint[]
   getPayslipsForUser: (userId: string) => Payslip[]
@@ -32,7 +35,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [complaints, setComplaints] = useState<Complaint[]>(() =>
     loadFromStorage('complaints', SEED_COMPLAINTS),
   )
-  const [payslips] = useState<Payslip[]>(() => loadFromStorage('payslips', PAYSLIPS))
+  const [payslips, setPayslips] = useState<Payslip[]>(() => loadFromStorage('payslips', PAYSLIPS))
   const [users, setUsers] = useState<User[]>(() => loadFromStorage('users', DEMO_USERS))
   const [elearningProgress, setElearningProgress] = useState<CourseProgress[]>(() =>
     loadFromStorage('elearning_progress', SEED_PROGRESS),
@@ -105,6 +108,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const updateUserRole = useCallback(
     (userId: string, newRole: UserRole) => {
       const updated = users.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+      setUsers(updated)
+      saveToStorage('users', updated)
+    },
+    [users],
+  )
+
+  const addPayslip = useCallback(
+    (payslip: Payslip) => {
+      const updated = [payslip, ...payslips]
+      setPayslips(updated)
+      saveToStorage('payslips', updated)
+    },
+    [payslips],
+  )
+
+  const updatePayslip = useCallback(
+    (payslipId: string, updates: Partial<Payslip>) => {
+      const updated = payslips.map((p) => (p.id === payslipId ? { ...p, ...updates } : p))
+      setPayslips(updated)
+      saveToStorage('payslips', updated)
+    },
+    [payslips],
+  )
+
+  const updateUserStatus = useCallback(
+    (userId: string, newStatus: ServiceStatus) => {
+      const updated = users.map((u) => (u.id === userId ? { ...u, status: newStatus } : u))
       setUsers(updated)
       saveToStorage('users', updated)
     },
@@ -185,7 +215,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       value={{
         complaints, payslips, users, elearningProgress,
         addComplaint, updateComplaintStatus,
-        addNote, updateUserRole, getComplaintsForUser, getComplaintsForDivision, getPayslipsForUser,
+        addNote, updateUserRole, addPayslip, updatePayslip, updateUserStatus,
+        getComplaintsForUser, getComplaintsForDivision, getPayslipsForUser,
         toggleContentCompletion, toggleBookmark, getProgressForUser,
       }}
     >
