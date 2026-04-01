@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '#/components/ui/dialog'
-import { Lock, Eye, PenLine, Shield, Fingerprint, Briefcase, MapPin, Phone, Calendar, Hash, Building2, Users, Award, ChevronRight } from 'lucide-react'
+import { Lock, Eye, PenLine, Shield, Fingerprint, Briefcase, MapPin, Phone, Calendar, ChevronRight } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/profile')({
   component: ProfilePage,
@@ -104,8 +104,6 @@ function ProfilePage() {
           <p className="text-sm text-gray-400 mt-0.5">
             <span className="font-mono">{user.armyNumber}</span>
             <span className="text-gray-300 mx-1.5">·</span>
-            {user.rank}
-            <span className="text-gray-300 mx-1.5">·</span>
             {user.division}
           </p>
         </div>
@@ -184,12 +182,11 @@ function ProfilePage() {
         <div className="px-5 pb-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
             {([
-              { icon: Users, label: 'Full Name', value: user.name },
-              { icon: Hash, label: 'Army Number', value: user.armyNumber, mono: true },
               { icon: Calendar, label: 'Date of Birth', value: formatDate(user.dateOfBirth) },
               { icon: Calendar, label: 'Date of Enlistment', value: formatDate(user.dateOfEnlistment) },
               { icon: MapPin, label: 'State of Origin', value: user.stateOfOrigin },
               { icon: Phone, label: 'Phone', value: user.phone },
+              { icon: Briefcase, label: 'Unit', value: user.unit },
             ]).map((row) => (
               <div key={row.label} className="flex items-start gap-3 py-2">
                 <row.icon className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
@@ -210,34 +207,6 @@ function ProfilePage() {
             To correct any personal information, raise a complaint ticket
             <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-army-gold transition-colors" />
           </Link>
-        </div>
-      </div>
-
-      {/* Unit & Assignment */}
-      <div className="bg-white rounded-xl border border-gray-100">
-        <div className="flex items-center gap-2.5 px-5 pt-4 pb-3">
-          <div className="w-8 h-8 rounded-lg bg-army/8 flex items-center justify-center">
-            <Building2 className="w-4 h-4 text-army" />
-          </div>
-          <h3 className="text-sm font-bold text-army-dark">Unit & Assignment</h3>
-        </div>
-        <div className="px-5 pb-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-            {([
-              { icon: Briefcase, label: 'Unit', value: user.unit },
-              { icon: Building2, label: 'Division', value: user.division },
-              { icon: Award, label: 'Corps', value: user.corps },
-              { icon: Shield, label: 'Trade', value: user.trade },
-            ]).map((row) => (
-              <div key={row.label} className="flex items-start gap-3 py-2">
-                <row.icon className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">{row.label}</p>
-                  <p className="text-sm text-army-dark font-semibold truncate">{row.value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
