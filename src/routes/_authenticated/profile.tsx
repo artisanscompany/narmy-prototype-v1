@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '#/components/ui/dialog'
-import { Lock, Eye, PenLine, Shield, Fingerprint, Briefcase, MapPin, Phone, Calendar, ChevronRight } from 'lucide-react'
+import { Lock, Eye, PenLine, Shield, Fingerprint, Building2, MapPin, Phone, Calendar, ChevronRight, Wallet, MessageCircle } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/profile')({
   component: ProfilePage,
@@ -81,7 +81,7 @@ function ProfilePage() {
         {isRevealed ? (
           <Eye className="w-3.5 h-3.5 text-army-mid opacity-50 group-hover/field:opacity-100 transition-opacity" />
         ) : (
-          <Lock className="w-3 h-3 text-army-gold/50 group-hover/field:text-army-gold transition-colors" />
+          <Lock className="w-3.5 h-3.5 text-army-gold group-hover/field:text-army-gold transition-colors" />
         )}
       </button>
     )
@@ -95,49 +95,58 @@ function ProfilePage() {
     })
   }
 
+  const serviceItems = [
+    { label: 'Rank', value: user.rank },
+    { label: 'Grade / Step', value: `${user.gradeLevel} – A${user.step}` },
+    { label: 'Trade', value: user.trade },
+    { label: 'Corps', value: user.corps },
+    { label: 'Service', value: `${serviceYears}y ${serviceMonths}m` },
+  ]
+
   return (
     <div className="max-w-3xl mx-auto space-y-3">
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-army-dark">{user.name}</h1>
+      {/* Page header — name + status inline */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold text-army-dark truncate">{user.name}</h1>
+            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${
+              user.status === 'active' ? 'bg-green-50 text-green-700' :
+              user.status === 'awol' ? 'bg-red-50 text-red-700' :
+              user.status === 'retired' ? 'bg-gray-100 text-gray-600' :
+              'bg-orange-50 text-orange-700'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                user.status === 'active' ? 'bg-green-500' :
+                user.status === 'awol' ? 'bg-red-500' :
+                user.status === 'retired' ? 'bg-gray-400' :
+                'bg-orange-500'
+              }`} />
+              {user.status === 'awol' ? 'AWOL' : user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+            </span>
+          </div>
           <p className="text-sm text-gray-400 mt-0.5">
             <span className="font-mono">{user.armyNumber}</span>
             <span className="text-gray-300 mx-1.5">·</span>
             {user.division}
           </p>
         </div>
-        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full mt-1 ${
-          user.status === 'active' ? 'bg-green-50 text-green-700' :
-          user.status === 'awol' ? 'bg-red-50 text-red-700' :
-          user.status === 'retired' ? 'bg-gray-100 text-gray-600' :
-          'bg-orange-50 text-orange-700'
-        }`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${
-            user.status === 'active' ? 'bg-green-500' :
-            user.status === 'awol' ? 'bg-red-500' :
-            user.status === 'retired' ? 'bg-gray-400' :
-            'bg-orange-500'
-          }`} />
-          {user.status === 'awol' ? 'AWOL' : user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-        </span>
       </div>
 
-      {/* Service summary strip */}
-      <div className="bg-white rounded-xl border border-gray-100 px-5 py-3.5">
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-x-6 gap-y-3">
-          {[
-            { label: 'Rank', value: user.rank },
-            { label: 'Grade / Step', value: `${user.gradeLevel} – A${user.step}` },
-            { label: 'Trade', value: user.trade },
-            { label: 'Corps', value: user.corps },
-            { label: 'Service', value: `${serviceYears}y ${serviceMonths}m` },
-          ].map(({ label, value }) => (
-            <div key={label} className="min-w-0">
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">{label}</p>
-              <p className="text-sm text-army-dark font-semibold truncate">{value}</p>
+      {/* Service summary strip — with left accent bar and dividers */}
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="flex">
+          <div className="w-1 bg-army-gold shrink-0" />
+          <div className="flex-1 px-5 py-3.5">
+            <div className="flex items-center">
+              {serviceItems.map(({ label, value }, i) => (
+                <div key={label} className={`flex-1 min-w-0 ${i < serviceItems.length - 1 ? 'border-r border-gray-100 pr-4 mr-4' : ''}`}>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">{label}</p>
+                  <p className="text-sm text-army-dark font-semibold truncate">{value}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
@@ -148,11 +157,14 @@ function ProfilePage() {
             <div className="w-8 h-8 rounded-lg bg-army-gold/8 flex items-center justify-center">
               <Fingerprint className="w-4 h-4 text-army-gold" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-army-dark">Sensitive Identifiers</h3>
-              <p className="text-[11px] text-gray-400">Click any field to verify and reveal</p>
-            </div>
+            <h3 className="text-sm font-bold text-army-dark">Sensitive Identifiers</h3>
           </div>
+          {revealedFields.size === 0 && (
+            <span className="text-[11px] text-gray-300 flex items-center gap-1">
+              <Lock className="w-3 h-3" />
+              Click to reveal
+            </span>
+          )}
         </div>
         <div className="px-3 pb-3">
           {([
@@ -162,7 +174,14 @@ function ProfilePage() {
           ]).map((row, i, arr) => (
             <div
               key={row.label}
-              className={`flex items-center justify-between py-3 px-2 ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}
+              className={`flex items-center justify-between py-3 px-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}
+              onClick={() => {
+                if (!revealedFields.has(row.field)) {
+                  setDecryptField(row.field)
+                  setCode('')
+                  setCodeError(false)
+                }
+              }}
             >
               <span className="text-xs font-medium text-gray-400">{row.label}</span>
               {renderSensitiveValue(row.field, row.value)}
@@ -186,28 +205,58 @@ function ProfilePage() {
               { icon: Calendar, label: 'Date of Enlistment', value: formatDate(user.dateOfEnlistment) },
               { icon: MapPin, label: 'State of Origin', value: user.stateOfOrigin },
               { icon: Phone, label: 'Phone', value: user.phone },
-              { icon: Briefcase, label: 'Unit', value: user.unit },
+              { icon: Building2, label: 'Unit', value: user.unit },
+              { icon: MapPin, label: 'Division', value: user.division },
             ]).map((row) => (
               <div key={row.label} className="flex items-start gap-3 py-2">
                 <row.icon className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
                 <div className="min-w-0">
                   <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">{row.label}</p>
-                  <p className={`text-sm text-army-dark font-semibold truncate ${row.mono ? 'font-mono' : ''}`}>{row.value}</p>
+                  <p className="text-sm text-army-dark font-semibold truncate">{row.value}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="border-t border-gray-100 px-5 py-3">
+
+        {/* Correction CTA — dark banner like help page */}
+        <div className="bg-army-dark rounded-b-xl px-5 py-3.5 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold text-white">Need to correct your information?</p>
+            <p className="text-[11px] text-white/40">Raise a complaint ticket and our team will update your records</p>
+          </div>
           <Link
             to="/complaints/new"
-            className="inline-flex items-center gap-2 text-xs text-army font-medium hover:text-army-gold transition-colors group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-army-gold text-army-dark text-xs font-bold hover:bg-army-gold-light transition-colors whitespace-nowrap shrink-0"
           >
-            <PenLine className="w-3 h-3" />
-            To correct any personal information, raise a complaint ticket
-            <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-army-gold transition-colors" />
+            <PenLine className="w-3.5 h-3.5" />
+            Raise Ticket
           </Link>
         </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="grid grid-cols-2 gap-3">
+        <Link to="/pay" className="group bg-white rounded-xl border border-gray-100 px-4 py-3.5 flex items-center gap-3 hover:border-army-gold/20 hover:shadow-sm transition-all">
+          <div className="w-8 h-8 rounded-lg bg-army-gold/8 flex items-center justify-center shrink-0">
+            <Wallet className="w-4 h-4 text-army-gold" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-army-dark">Pay & Documents</p>
+            <p className="text-[11px] text-gray-400">Payslips & certificates</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-army-gold transition-colors shrink-0" />
+        </Link>
+        <Link to="/complaints" className="group bg-white rounded-xl border border-gray-100 px-4 py-3.5 flex items-center gap-3 hover:border-army-gold/20 hover:shadow-sm transition-all">
+          <div className="w-8 h-8 rounded-lg bg-army/8 flex items-center justify-center shrink-0">
+            <MessageCircle className="w-4 h-4 text-army" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-army-dark">My Complaints</p>
+            <p className="text-[11px] text-gray-400">Track & raise tickets</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-army-gold transition-colors shrink-0" />
+        </Link>
       </div>
 
       {/* Decrypt Modal */}
