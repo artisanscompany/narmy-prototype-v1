@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Check, X } from 'lucide-react'
 import type { UserRole } from '#/types/user'
 
@@ -27,6 +26,8 @@ const PERMISSIONS: Permission[] = [
   { action: 'Manage Users', description: 'View and manage user accounts', roles: ['superAdmin'] },
   { action: 'Change User Roles', description: 'Assign or change user roles', roles: ['superAdmin'] },
   { action: 'View RBAC Matrix', description: 'View role-based access control settings', roles: ['divisionAdmin', 'superAdmin'] },
+  { action: 'Upload Payslips', description: 'Upload payslip records for personnel', roles: ['divisionAdmin', 'superAdmin'] },
+  { action: 'Change User Status', description: 'Update service status (Active/AWOL/Suspended/Retired)', roles: ['divisionAdmin', 'superAdmin'] },
 ]
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -39,67 +40,73 @@ const ALL_ROLES: UserRole[] = ['personnel', 'divisionAdmin', 'superAdmin']
 
 function AdminRBAC() {
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="mb-6">
+    <div className="max-w-3xl mx-auto space-y-3">
+      <div>
         <h1 className="text-2xl font-bold text-army-dark">Role-Based Access Control</h1>
-        <p className="text-gray-500 text-sm mt-1">Permission matrix for all system roles</p>
+        <p className="text-sm text-gray-400 mt-0.5">Permission matrix for all system roles</p>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader><CardTitle className="text-base">Role Descriptions</CardTitle></CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold text-army-dark text-sm mb-1">Personnel</h3>
-              <p className="text-xs text-gray-500">Regular army personnel who can file complaints, view their own tickets and payslips.</p>
-            </div>
-            <div className="p-4 bg-amber-50 rounded-lg">
-              <h3 className="font-semibold text-army-dark text-sm mb-1">Division Admin</h3>
-              <p className="text-xs text-gray-500">Division-level administrators who manage tickets, view analytics, and escalate issues within their division.</p>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <h3 className="font-semibold text-army-dark text-sm mb-1">Super Admin</h3>
-              <p className="text-xs text-gray-500">System-wide administrators with full access to all divisions, user management, and system analytics.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="flex">
+            <div className="w-1.5 bg-gray-300 shrink-0" />
+            <div className="flex-1 px-4 py-3.5">
+              <p className="text-sm font-bold text-army-dark mb-0.5">Personnel</p>
+              <p className="text-xs text-gray-400">Regular army personnel who can file complaints, view their own tickets and payslips.</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card>
-        <CardHeader><CardTitle className="text-base">Permission Matrix</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-gray-50/50">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Permission</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600 min-w-[100px]">Description</th>
-                  {ALL_ROLES.map((role) => (
-                    <th key={role} className="text-center px-4 py-3 font-semibold text-gray-600">{ROLE_LABELS[role]}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {PERMISSIONS.map((perm) => (
-                  <tr key={perm.action} className="border-b last:border-b-0 hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-900">{perm.action}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">{perm.description}</td>
-                    {ALL_ROLES.map((role) => (
-                      <td key={role} className="px-4 py-3 text-center">
-                        {perm.roles.includes(role) ? (
-                          <Check className="w-5 h-5 text-green-600 mx-auto" />
-                        ) : (
-                          <X className="w-5 h-5 text-gray-300 mx-auto" />
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="flex">
+            <div className="w-1.5 bg-army-gold shrink-0" />
+            <div className="flex-1 px-4 py-3.5">
+              <p className="text-sm font-bold text-army-dark mb-0.5">Division Admin</p>
+              <p className="text-xs text-gray-400">Division-level administrators who manage tickets, view analytics, and escalate issues within their division.</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="flex">
+            <div className="w-1.5 bg-army shrink-0" />
+            <div className="flex-1 px-4 py-3.5">
+              <p className="text-sm font-bold text-army-dark mb-0.5">Super Admin</p>
+              <p className="text-xs text-gray-400">System-wide administrators with full access to all divisions, user management, and system analytics.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-gray-50/50">
+              <th className="text-left px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Permission</th>
+              {ALL_ROLES.map((role) => (
+                <th key={role} className="text-center px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">{ROLE_LABELS[role]}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {PERMISSIONS.map((perm) => (
+              <tr key={perm.action} className="border-b last:border-b-0 hover:bg-gray-50/50 transition-colors">
+                <td className="px-4 py-2.5">
+                  <p className="text-sm font-medium text-army-dark">{perm.action}</p>
+                  <p className="text-[11px] text-gray-400">{perm.description}</p>
+                </td>
+                {ALL_ROLES.map((role) => (
+                  <td key={role} className="px-4 py-2.5 text-center">
+                    {perm.roles.includes(role)
+                      ? <Check className="w-4 h-4 text-green-600 mx-auto" />
+                      : <X className="w-4 h-4 text-gray-200 mx-auto" />}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
