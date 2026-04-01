@@ -44,6 +44,18 @@ function AdminTicketDetail() {
 
   if (!user) return null
 
+  // Division admin scope check
+  if (ticket && user.role === 'divisionAdmin' && ticket.userDivision !== user.division) {
+    return (
+      <div className="max-w-3xl mx-auto py-20 text-center">
+        <p className="text-sm text-gray-400 mb-3">You do not have access to this ticket</p>
+        <Link to="/admin/tickets" className="text-sm text-army font-semibold hover:text-army-gold transition-colors">
+          Back to tickets
+        </Link>
+      </div>
+    )
+  }
+
   if (!ticket) {
     return (
       <div className="max-w-3xl mx-auto py-20 text-center">

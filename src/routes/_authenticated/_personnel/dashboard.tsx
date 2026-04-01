@@ -94,7 +94,7 @@ function PersonnelDashboard() {
             {getGreeting()}, {user.rank} {user.name.split(' ').pop()}
           </h1>
           <p className="text-xs text-white/30 mt-1">
-            {user.status === 'awol' ? 'AWOL' : 'Active Duty'} · {serviceYears}y {serviceMonths}m service · {user.division}
+            {user.status === 'awol' ? 'AWOL' : user.status === 'suspended' ? 'Suspended' : user.status === 'retired' ? 'Retired' : 'Active Duty'} · {serviceYears}y {serviceMonths}m service · {user.division}
           </p>
         </div>
 

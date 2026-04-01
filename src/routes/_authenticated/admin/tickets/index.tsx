@@ -168,11 +168,13 @@ function AdminTickets() {
                 {/* Row 1: badges */}
                 <div className="flex items-center gap-2 mb-1.5">
                   <StatusBadge status={ticket.status} />
-                  <span
-                    className={`text-[11px] font-semibold ${slaBreach ? 'text-red-500' : slaWarning ? 'text-amber-500' : 'text-gray-400'}`}
-                  >
-                    {slaBreach ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d left`}
-                  </span>
+                  {!['resolved', 'closed'].includes(ticket.status) && (
+                    <span
+                      className={`text-[11px] font-semibold ${slaBreach ? 'text-red-500' : slaWarning ? 'text-amber-500' : 'text-gray-400'}`}
+                    >
+                      {slaBreach ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d left`}
+                    </span>
+                  )}
                   <span
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${priorityClasses}`}
                   >

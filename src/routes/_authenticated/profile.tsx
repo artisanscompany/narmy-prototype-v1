@@ -40,7 +40,7 @@ function ProfilePage() {
 
   const enlistDate = new Date(user.dateOfEnlistment)
   const now = new Date()
-  const totalMonths = (now.getFullYear() - enlistDate.getFullYear()) * 12 + (now.getMonth() - enlistDate.getMonth())
+  const totalMonths = Math.max(0, (now.getFullYear() - enlistDate.getFullYear()) * 12 + (now.getMonth() - enlistDate.getMonth()))
   const serviceYears = Math.floor(totalMonths / 12)
   const serviceMonths = totalMonths % 12
 

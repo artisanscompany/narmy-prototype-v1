@@ -83,7 +83,7 @@ function PayDocumentsPage() {
   }
 
   const downloadTaxCert = async () => {
-    const blob = await pdf(<TaxCertPDF user={user} taxYear={2025} />).toBlob()
+    const blob = await pdf(<TaxCertPDF user={user} taxYear={new Date().getFullYear() - 1} />).toBlob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -97,7 +97,7 @@ function PayDocumentsPage() {
       {/* Header */}
       <div className="mb-3">
         <h1 className="text-2xl font-bold text-army-dark">Pay & Documents</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{allPayslips.length} payslips · {years[0]}–{years[years.length - 1]}</p>
+        <p className="text-sm text-gray-500 mt-0.5">{allPayslips.length} payslips{years.length > 0 ? ` · ${years[0]}–${years[years.length - 1]}` : ''}</p>
       </div>
 
       {/* Summary strip */}
@@ -132,7 +132,7 @@ function PayDocumentsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold text-army-dark">Tax Exemption Certificate</p>
-            <p className="text-xs text-gray-500">Financial Year 2025</p>
+            <p className="text-xs text-gray-500">Financial Year {new Date().getFullYear() - 1}</p>
           </div>
         </div>
         <button

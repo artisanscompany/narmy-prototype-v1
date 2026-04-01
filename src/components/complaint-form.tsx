@@ -85,6 +85,17 @@ export function ComplaintForm() {
     setAttachments((prev) => prev.filter((a) => a.id !== id))
   }
 
+  const getAutoPriority = (): 'low' | 'medium' | 'high' | 'critical' => {
+    const sub = selectedCategory?.subcategories.find((s) => s.id === subcategoryId)
+    const catLabel = selectedCategory?.label?.toLowerCase() ?? ''
+    const subLabel = sub?.label?.toLowerCase() ?? ''
+    if (catLabel.includes('status') && subLabel.includes('awol')) return 'critical'
+    if (catLabel.includes('status')) return 'high'
+    if (catLabel.includes('pay')) return 'high'
+    if (catLabel.includes('posting')) return 'medium'
+    return 'medium'
+  }
+
   const handleSubmit = () => {
     const year = new Date().getFullYear()
     const uid = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
@@ -99,10 +110,10 @@ export function ComplaintForm() {
       subcategory: selectedCategory?.subcategories.find((s) => s.id === subcategoryId)?.label ?? '',
       description,
       status: 'submitted',
-      priority: 'medium',
+      priority: getAutoPriority(),
       filedDate: now,
       lastUpdated: now,
-      slaDeadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      slaDeadline: new Date(Date.now() + (getAutoPriority() === 'critical' ? 7 : 14) * 24 * 60 * 60 * 1000).toISOString(),
       timeline: [
         {
           id: `evt-${Date.now()}`,
@@ -302,7 +313,7 @@ export function ComplaintForm() {
             </div>
             <div className="px-5 py-3.5 flex items-center justify-between">
               <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">Priority</span>
-              <span className="text-sm font-semibold text-gray-600">Medium (auto-assigned)</span>
+              <span className="text-sm font-semibold text-gray-600">{getAutoPriority().charAt(0).toUpperCase() + getAutoPriority().slice(1)} (auto-assigned)</span>
             </div>
             <div className="px-5 py-3.5 flex items-center justify-between">
               <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">SLA</span>
