@@ -3,11 +3,10 @@ import { useAuth } from '#/contexts/AuthContext'
 import { useData } from '#/contexts/DataContext'
 import { StatusBadge } from '#/components/status-badge'
 import { TimelineView } from '#/components/timeline-view'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { differenceInDays, format } from 'date-fns'
-import { useState } from 'react'
-import { ArrowLeft, AlertTriangle, Send } from 'lucide-react'
-import type { ComplaintStatus } from '#/types/complaint'
+import { useState, useRef } from 'react'
+import { ArrowLeft, AlertTriangle, Send, Paperclip, X, File, Download, User as UserIcon } from 'lucide-react'
+import type { ComplaintStatus, Attachment } from '#/types/complaint'
 
 export const Route = createFileRoute('/_authenticated/admin/tickets/$ticketId')({
   component: AdminTicketDetail,
@@ -28,6 +27,8 @@ function AdminTicketDetail() {
   const { complaints, updateComplaintStatus, addNote } = useData()
   const [noteText, setNoteText] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<ComplaintStatus | ''>('')
+  const [noteAttachments, setNoteAttachments] = useState<Attachment[]>([])
+  const noteFileRef = useRef<HTMLInputElement>(null)
 
   const ticket = complaints.find((c) => c.id === ticketId)
 
@@ -35,199 +36,359 @@ function AdminTicketDetail() {
 
   if (!ticket) {
     return (
-      <div className="max-w-4xl mx-auto text-center py-20">
-        <h2 className="text-xl font-bold text-gray-700 mb-2">Ticket not found</h2>
-        <p className="text-gray-500 mb-4">The ticket "{ticketId}" does not exist.</p>
-        <Link to="/admin/tickets" className="text-army-dark font-medium hover:underline">
+      <div className="max-w-3xl mx-auto py-20 text-center">
+        <p className="text-sm text-gray-400 mb-3">Ticket not found</p>
+        <Link to="/admin/tickets" className="text-sm text-army font-semibold hover:text-army-gold transition-colors">
           Back to tickets
         </Link>
       </div>
     )
   }
 
+  const daysOpen = differenceInDays(new Date(), new Date(ticket.filedDate))
   const daysLeft = differenceInDays(new Date(ticket.slaDeadline), new Date())
   const slaBreach = daysLeft < 0
   const availableStatuses = STATUS_TRANSITIONS[ticket.status] ?? []
-
-  function handleStatusChange() {
-    if (!selectedStatus || !user) return
-    updateComplaintStatus(ticket.id, selectedStatus, user.name, noteText || `Status changed to ${selectedStatus}`)
-    setSelectedStatus('')
-    setNoteText('')
-  }
-
-  function handleAddNote() {
-    if (!noteText.trim() || !user) return
-    addNote(ticket.id, noteText, user.name)
-    setNoteText('')
-  }
-
-  function handleEscalate() {
-    if (!user) return
-    updateComplaintStatus(ticket.id, 'escalated', user.name, noteText || 'Ticket escalated by admin')
-    setNoteText('')
-  }
+  const isClosed = ticket.status === 'closed'
+  const canEscalate = ticket.status !== 'escalated' && ticket.status !== 'resolved' && ticket.status !== 'closed'
+  const canRequestInfo = availableStatuses.includes('needs-more-info')
 
   const sortedTimeline = [...ticket.timeline].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   )
 
+  const handleNoteFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+    Array.from(files).forEach((file) => {
+      if (file.size > 5 * 1024 * 1024) return
+      const reader = new FileReader()
+      reader.onload = () => {
+        setNoteAttachments((prev) => [
+          ...prev,
+          {
+            id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            dataUrl: reader.result as string,
+          },
+        ])
+      }
+      reader.readAsDataURL(file)
+    })
+    if (noteFileRef.current) noteFileRef.current.value = ''
+  }
+
+  const handleAddNote = () => {
+    if ((!noteText.trim() && noteAttachments.length === 0) || !user) return
+    const attachmentsWithMeta: Attachment[] = noteAttachments.map((a) => ({
+      ...a,
+      source: 'response' as const,
+      uploadedAt: new Date().toISOString(),
+    }))
+    addNote(ticket.id, noteText, user.name, attachmentsWithMeta.length > 0 ? attachmentsWithMeta : undefined)
+    setNoteText('')
+    setNoteAttachments([])
+  }
+
+  const handleStatusChange = () => {
+    if (!selectedStatus || !user) return
+    updateComplaintStatus(ticket.id, selectedStatus, user.name, noteText || `Status changed to ${selectedStatus}`)
+    setSelectedStatus('')
+    setNoteText('')
+    setNoteAttachments([])
+  }
+
+  const handleEscalate = () => {
+    if (!user) return
+    updateComplaintStatus(ticket.id, 'escalated', user.name, noteText || 'Ticket escalated by admin')
+    setNoteText('')
+    setNoteAttachments([])
+  }
+
+  const handleRequestInfo = () => {
+    if (!user) return
+    updateComplaintStatus(ticket.id, 'needs-more-info', user.name, noteText || 'Please provide additional information regarding: ')
+    setNoteText('')
+    setNoteAttachments([])
+  }
+
   return (
-    <div className="max-w-5xl mx-auto">
-      <Link to="/admin/tickets" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-army-dark mb-4 transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to tickets
+    <div className="max-w-3xl mx-auto space-y-3">
+      {/* Back link */}
+      <Link
+        to="/admin/tickets"
+        className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-army transition-colors"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        Back to tickets
       </Link>
 
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-army-dark">{ticket.id}</h1>
-            <StatusBadge status={ticket.status} />
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-              ticket.priority === 'critical' ? 'bg-red-100 text-red-700' :
-              ticket.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-              ticket.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-              'bg-gray-100 text-gray-600'
-            }`}>
-              {ticket.priority}
-            </span>
+      {/* Header */}
+      <div className="mb-1">
+        <div className="flex items-center gap-2.5 mb-2">
+          <span className="text-xs font-mono text-gray-400">{ticket.id}</span>
+          <StatusBadge status={ticket.status} />
+          <span
+            className={`text-xs font-semibold px-2 py-0.5 rounded ${
+              ticket.priority === 'critical'
+                ? 'bg-red-100 text-red-700'
+                : ticket.priority === 'high'
+                  ? 'bg-orange-100 text-orange-700'
+                  : ticket.priority === 'medium'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {ticket.priority}
+          </span>
+        </div>
+        <h1 className="text-xl font-bold text-army-dark mb-1">{ticket.subcategory}</h1>
+        <p className="text-sm text-gray-400">{ticket.category}</p>
+      </div>
+
+      {/* Meta grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Filed', value: format(new Date(ticket.filedDate), 'd MMM yyyy') },
+          {
+            label: 'Priority',
+            value: ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1),
+            color:
+              ticket.priority === 'critical'
+                ? 'text-red-600'
+                : ticket.priority === 'high'
+                  ? 'text-amber-600'
+                  : undefined,
+          },
+          { label: 'Days Open', value: `${daysOpen} days` },
+          {
+            label: 'SLA',
+            value: slaBreach ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d left`,
+            color: slaBreach ? 'text-red-600' : 'text-green-600',
+          },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="bg-white rounded-xl border border-gray-100 px-4 py-3">
+            <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">{label}</p>
+            <p className={`text-sm font-semibold ${color ?? 'text-army-dark'}`}>{value}</p>
           </div>
-          <p className="text-gray-500 text-sm">{ticket.category} &mdash; {ticket.subcategory}</p>
-        </div>
-        <div className={`flex items-center gap-1.5 text-sm font-medium ${slaBreach ? 'text-red-600' : daysLeft <= 2 ? 'text-amber-600' : 'text-green-600'}`}>
-          {slaBreach && <AlertTriangle className="w-4 h-4" />}
-          SLA: {slaBreach ? `${Math.abs(daysLeft)} days overdue` : `${daysLeft} days remaining`}
-        </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <CardHeader><CardTitle className="text-base">Description</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{ticket.description}</p>
-            </CardContent>
-          </Card>
+      {/* SLA breach alert */}
+      {slaBreach && (
+        <div className="flex items-center gap-2.5 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">
+          <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+          <p className="text-xs text-red-700">
+            SLA exceeded by {Math.abs(daysLeft)} days. This ticket requires immediate attention.
+          </p>
+        </div>
+      )}
 
-          <Card>
-            <CardHeader><CardTitle className="text-base">Timeline</CardTitle></CardHeader>
-            <CardContent>
-              <TimelineView events={sortedTimeline} />
-            </CardContent>
-          </Card>
+      {/* Filer info card */}
+      <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-army/8 flex items-center justify-center shrink-0">
+            <UserIcon className="w-4 h-4 text-army" />
+          </div>
+          <h3 className="text-sm font-bold text-army-dark">Filer Details</h3>
+        </div>
+        <dl className="space-y-3 text-sm">
+          <div>
+            <dt className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Name</dt>
+            <dd className="font-semibold text-army-dark">{ticket.userName}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Army Number</dt>
+            <dd className="font-semibold text-army-dark">{ticket.userArmyNumber}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Division</dt>
+            <dd className="font-semibold text-army-dark">{ticket.userDivision}</dd>
+          </div>
+        </dl>
+        <Link
+          to="/admin/users"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-army hover:text-army-gold transition-colors mt-3"
+        >
+          View full profile →
+        </Link>
+      </div>
 
-          <Card>
-            <CardHeader><CardTitle className="text-base">Admin Actions</CardTitle></CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-1">Add Note / Comment</label>
-                  <textarea
-                    value={noteText}
-                    onChange={(e) => setNoteText(e.target.value)}
-                    rows={3}
-                    placeholder="Type your note here..."
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-army/30 resize-none"
-                  />
-                </div>
+      {/* Description card */}
+      <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Description</h3>
+        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+      </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={handleAddNote}
-                    disabled={!noteText.trim()}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-army-dark text-white hover:bg-army-dark/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <Send className="w-3.5 h-3.5" /> Add Note
-                  </button>
-
-                  {availableStatuses.length > 0 && (
-                    <>
-                      <select
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value as ComplaintStatus)}
-                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
-                      >
-                        <option value="">Change status...</option>
-                        {availableStatuses.map((s) => (
-                          <option key={s} value={s}>{s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={handleStatusChange}
-                        disabled={!selectedStatus}
-                        className="px-4 py-2 rounded-lg text-sm font-medium bg-army text-white hover:bg-army/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Update Status
-                      </button>
-                    </>
+      {/* Attachments card */}
+      {ticket.attachments && ticket.attachments.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+            Attachments ({ticket.attachments.length})
+          </h3>
+          <div>
+            {ticket.attachments.map((att) => {
+              const isImg = att.type.startsWith('image/')
+              return (
+                <div key={att.id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-b-0">
+                  {isImg ? (
+                    <img src={att.dataUrl} alt={att.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                      <File className="w-4 h-4 text-red-400" />
+                    </div>
                   )}
-
-                  {ticket.status !== 'escalated' && ticket.status !== 'resolved' && ticket.status !== 'closed' && (
-                    <button
-                      onClick={handleEscalate}
-                      className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-army-dark truncate">{att.name}</p>
+                    <p className="text-xs text-gray-400">{(att.size / 1024).toFixed(1)} KB</p>
+                  </div>
+                  {att.source && (
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+                        att.source === 'response'
+                          ? 'bg-army-gold/10 text-army-gold'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}
                     >
-                      Escalate
-                    </button>
+                      {att.source === 'response' ? 'Response' : 'Submission'}
+                    </span>
                   )}
+                  <a
+                    href={att.dataUrl}
+                    download={att.name}
+                    className="text-gray-400 hover:text-army transition-colors shrink-0"
+                  >
+                    <Download className="w-4 h-4" />
+                  </a>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              )
+            })}
+          </div>
         </div>
+      )}
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader><CardTitle className="text-base">Filer Details</CardTitle></CardHeader>
-            <CardContent>
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Name</dt>
-                  <dd className="font-medium text-gray-900">{ticket.userName}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Army Number</dt>
-                  <dd className="font-medium text-gray-900">{ticket.userArmyNumber}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Division</dt>
-                  <dd className="font-medium text-gray-900">{ticket.userDivision}</dd>
-                </div>
-              </dl>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle className="text-base">Ticket Info</CardTitle></CardHeader>
-            <CardContent>
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Filed Date</dt>
-                  <dd className="font-medium text-gray-900">{format(new Date(ticket.filedDate), 'd MMM yyyy')}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Last Updated</dt>
-                  <dd className="font-medium text-gray-900">{format(new Date(ticket.lastUpdated), 'd MMM yyyy HH:mm')}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">SLA Deadline</dt>
-                  <dd className={`font-medium ${slaBreach ? 'text-red-600' : 'text-gray-900'}`}>
-                    {format(new Date(ticket.slaDeadline), 'd MMM yyyy')}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Category</dt>
-                  <dd className="font-medium text-gray-900">{ticket.category}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-400 text-xs uppercase tracking-wide">Subcategory</dt>
-                  <dd className="font-medium text-gray-900">{ticket.subcategory}</dd>
-                </div>
-              </dl>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Timeline */}
+      <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Activity</h3>
+        <TimelineView events={sortedTimeline} />
       </div>
+
+      {/* Admin response section */}
+      {!isClosed && (
+        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+          <p className="text-sm font-bold text-army-dark mb-3">Respond</p>
+
+          <textarea
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            rows={4}
+            placeholder="Type your response, note, or action..."
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-army/15 focus:border-army/30 transition-all"
+          />
+
+          {/* Attachment preview */}
+          {noteAttachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {noteAttachments.map((att) => (
+                <div
+                  key={att.id}
+                  className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1.5 text-xs text-gray-600"
+                >
+                  {att.type.startsWith('image/') ? (
+                    <img src={att.dataUrl} alt={att.name} className="w-5 h-5 rounded object-cover" />
+                  ) : (
+                    <File className="w-3.5 h-3.5 text-red-400" />
+                  )}
+                  <span className="truncate max-w-32">{att.name}</span>
+                  <button
+                    onClick={() => setNoteAttachments((prev) => prev.filter((a) => a.id !== att.id))}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Action bar */}
+          <div className="flex items-center justify-between mt-3">
+            {/* Left: attach + add response */}
+            <div className="flex items-center gap-3">
+              <input
+                ref={noteFileRef}
+                type="file"
+                accept="image/*,.pdf"
+                multiple
+                onChange={handleNoteFileSelect}
+                className="hidden"
+              />
+              <button
+                onClick={() => noteFileRef.current?.click()}
+                className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-army transition-colors cursor-pointer"
+              >
+                <Paperclip className="w-3.5 h-3.5" />
+                Attach file
+              </button>
+              <button
+                onClick={handleAddNote}
+                disabled={!noteText.trim() && noteAttachments.length === 0}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-army-gold text-army-dark text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-army-gold-light transition-colors"
+              >
+                <Send className="w-3.5 h-3.5" />
+                Add Response
+              </button>
+            </div>
+
+            {/* Right: request info, status change, escalate */}
+            <div className="flex items-center gap-2">
+              {canRequestInfo && (
+                <button
+                  onClick={handleRequestInfo}
+                  className="px-3 py-2 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                >
+                  Request Info
+                </button>
+              )}
+
+              {availableStatuses.length > 0 && (
+                <>
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value as ComplaintStatus)}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-xs bg-white"
+                  >
+                    <option value="">Change status...</option>
+                    {availableStatuses.map((s) => (
+                      <option key={s} value={s}>
+                        {s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleStatusChange}
+                    disabled={!selectedStatus}
+                    className="px-3 py-2 rounded-lg text-xs font-semibold bg-army-dark text-white hover:bg-army-dark/90 disabled:opacity-40 transition-colors"
+                  >
+                    Update
+                  </button>
+                </>
+              )}
+
+              {canEscalate && (
+                <button
+                  onClick={handleEscalate}
+                  className="px-3 py-2 rounded-lg text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                >
+                  Escalate
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
