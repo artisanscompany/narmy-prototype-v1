@@ -26,11 +26,11 @@ import { Route as AuthenticatedPersonnelDashboardRouteImport } from './routes/_a
 import { Route as AuthenticatedELearningDepartmentIdIndexRouteImport } from './routes/_authenticated/e-learning/$departmentId/index'
 import { Route as AuthenticatedAdminTicketsIndexRouteImport } from './routes/_authenticated/admin/tickets/index'
 import { Route as AuthenticatedPersonnelComplaintsIndexRouteImport } from './routes/_authenticated/_personnel/complaints/index'
-import { Route as AuthenticatedELearningDepartmentIdCourseIdRouteImport } from './routes/_authenticated/e-learning/$departmentId/$courseId'
 import { Route as AuthenticatedAdminTicketsTicketIdRouteImport } from './routes/_authenticated/admin/tickets/$ticketId'
 import { Route as AuthenticatedPersonnelComplaintsNewRouteImport } from './routes/_authenticated/_personnel/complaints/new'
 import { Route as AuthenticatedPersonnelComplaintsComplaintIdRouteImport } from './routes/_authenticated/_personnel/complaints/$complaintId'
-import { Route as AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport } from './routes/_authenticated/e-learning/$departmentId/$courseId.$contentId'
+import { Route as AuthenticatedELearningDepartmentIdCourseIdIndexRouteImport } from './routes/_authenticated/e-learning/$departmentId/$courseId/index'
+import { Route as AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport } from './routes/_authenticated/e-learning/$departmentId/$courseId/$contentId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -124,12 +124,6 @@ const AuthenticatedPersonnelComplaintsIndexRoute =
     path: '/complaints/',
     getParentRoute: () => AuthenticatedPersonnelRoute,
   } as any)
-const AuthenticatedELearningDepartmentIdCourseIdRoute =
-  AuthenticatedELearningDepartmentIdCourseIdRouteImport.update({
-    id: '/e-learning/$departmentId/$courseId',
-    path: '/e-learning/$departmentId/$courseId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminTicketsTicketIdRoute =
   AuthenticatedAdminTicketsTicketIdRouteImport.update({
     id: '/tickets/$ticketId',
@@ -148,11 +142,17 @@ const AuthenticatedPersonnelComplaintsComplaintIdRoute =
     path: '/complaints/$complaintId',
     getParentRoute: () => AuthenticatedPersonnelRoute,
   } as any)
+const AuthenticatedELearningDepartmentIdCourseIdIndexRoute =
+  AuthenticatedELearningDepartmentIdCourseIdIndexRouteImport.update({
+    id: '/e-learning/$departmentId/$courseId/',
+    path: '/e-learning/$departmentId/$courseId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedELearningDepartmentIdCourseIdContentIdRoute =
   AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport.update({
-    id: '/$contentId',
-    path: '/$contentId',
-    getParentRoute: () => AuthenticatedELearningDepartmentIdCourseIdRoute,
+    id: '/e-learning/$departmentId/$courseId/$contentId',
+    path: '/e-learning/$departmentId/$courseId/$contentId',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -171,11 +171,11 @@ export interface FileRoutesByFullPath {
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/admin/tickets/$ticketId': typeof AuthenticatedAdminTicketsTicketIdRoute
-  '/e-learning/$departmentId/$courseId': typeof AuthenticatedELearningDepartmentIdCourseIdRouteWithChildren
   '/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
   '/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
   '/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
+  '/e-learning/$departmentId/$courseId/': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -193,11 +193,11 @@ export interface FileRoutesByTo {
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/admin/tickets/$ticketId': typeof AuthenticatedAdminTicketsTicketIdRoute
-  '/e-learning/$departmentId/$courseId': typeof AuthenticatedELearningDepartmentIdCourseIdRouteWithChildren
   '/complaints': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/admin/tickets': typeof AuthenticatedAdminTicketsIndexRoute
   '/e-learning/$departmentId': typeof AuthenticatedELearningDepartmentIdIndexRoute
   '/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
+  '/e-learning/$departmentId/$courseId': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -218,11 +218,11 @@ export interface FileRoutesById {
   '/_authenticated/_personnel/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/_authenticated/_personnel/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/_authenticated/admin/tickets/$ticketId': typeof AuthenticatedAdminTicketsTicketIdRoute
-  '/_authenticated/e-learning/$departmentId/$courseId': typeof AuthenticatedELearningDepartmentIdCourseIdRouteWithChildren
   '/_authenticated/_personnel/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/_authenticated/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
   '/_authenticated/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
   '/_authenticated/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
+  '/_authenticated/e-learning/$departmentId/$courseId/': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -242,11 +242,11 @@ export interface FileRouteTypes {
     | '/complaints/$complaintId'
     | '/complaints/new'
     | '/admin/tickets/$ticketId'
-    | '/e-learning/$departmentId/$courseId'
     | '/complaints/'
     | '/admin/tickets/'
     | '/e-learning/$departmentId/'
     | '/e-learning/$departmentId/$courseId/$contentId'
+    | '/e-learning/$departmentId/$courseId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -264,11 +264,11 @@ export interface FileRouteTypes {
     | '/complaints/$complaintId'
     | '/complaints/new'
     | '/admin/tickets/$ticketId'
-    | '/e-learning/$departmentId/$courseId'
     | '/complaints'
     | '/admin/tickets'
     | '/e-learning/$departmentId'
     | '/e-learning/$departmentId/$courseId/$contentId'
+    | '/e-learning/$departmentId/$courseId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -288,11 +288,11 @@ export interface FileRouteTypes {
     | '/_authenticated/_personnel/complaints/$complaintId'
     | '/_authenticated/_personnel/complaints/new'
     | '/_authenticated/admin/tickets/$ticketId'
-    | '/_authenticated/e-learning/$departmentId/$courseId'
     | '/_authenticated/_personnel/complaints/'
     | '/_authenticated/admin/tickets/'
     | '/_authenticated/e-learning/$departmentId/'
     | '/_authenticated/e-learning/$departmentId/$courseId/$contentId'
+    | '/_authenticated/e-learning/$departmentId/$courseId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -421,13 +421,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPersonnelComplaintsIndexRouteImport
       parentRoute: typeof AuthenticatedPersonnelRoute
     }
-    '/_authenticated/e-learning/$departmentId/$courseId': {
-      id: '/_authenticated/e-learning/$departmentId/$courseId'
-      path: '/e-learning/$departmentId/$courseId'
-      fullPath: '/e-learning/$departmentId/$courseId'
-      preLoaderRoute: typeof AuthenticatedELearningDepartmentIdCourseIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin/tickets/$ticketId': {
       id: '/_authenticated/admin/tickets/$ticketId'
       path: '/tickets/$ticketId'
@@ -449,12 +442,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPersonnelComplaintsComplaintIdRouteImport
       parentRoute: typeof AuthenticatedPersonnelRoute
     }
+    '/_authenticated/e-learning/$departmentId/$courseId/': {
+      id: '/_authenticated/e-learning/$departmentId/$courseId/'
+      path: '/e-learning/$departmentId/$courseId'
+      fullPath: '/e-learning/$departmentId/$courseId/'
+      preLoaderRoute: typeof AuthenticatedELearningDepartmentIdCourseIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/e-learning/$departmentId/$courseId/$contentId': {
       id: '/_authenticated/e-learning/$departmentId/$courseId/$contentId'
-      path: '/$contentId'
+      path: '/e-learning/$departmentId/$courseId/$contentId'
       fullPath: '/e-learning/$departmentId/$courseId/$contentId'
       preLoaderRoute: typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport
-      parentRoute: typeof AuthenticatedELearningDepartmentIdCourseIdRoute
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
@@ -508,29 +508,15 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
-interface AuthenticatedELearningDepartmentIdCourseIdRouteChildren {
-  AuthenticatedELearningDepartmentIdCourseIdContentIdRoute: typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
-}
-
-const AuthenticatedELearningDepartmentIdCourseIdRouteChildren: AuthenticatedELearningDepartmentIdCourseIdRouteChildren =
-  {
-    AuthenticatedELearningDepartmentIdCourseIdContentIdRoute:
-      AuthenticatedELearningDepartmentIdCourseIdContentIdRoute,
-  }
-
-const AuthenticatedELearningDepartmentIdCourseIdRouteWithChildren =
-  AuthenticatedELearningDepartmentIdCourseIdRoute._addFileChildren(
-    AuthenticatedELearningDepartmentIdCourseIdRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
   AuthenticatedPersonnelRoute: typeof AuthenticatedPersonnelRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedELearningIndexRoute: typeof AuthenticatedELearningIndexRoute
-  AuthenticatedELearningDepartmentIdCourseIdRoute: typeof AuthenticatedELearningDepartmentIdCourseIdRouteWithChildren
   AuthenticatedELearningDepartmentIdIndexRoute: typeof AuthenticatedELearningDepartmentIdIndexRoute
+  AuthenticatedELearningDepartmentIdCourseIdContentIdRoute: typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
+  AuthenticatedELearningDepartmentIdCourseIdIndexRoute: typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -539,10 +525,12 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedELearningIndexRoute: AuthenticatedELearningIndexRoute,
-  AuthenticatedELearningDepartmentIdCourseIdRoute:
-    AuthenticatedELearningDepartmentIdCourseIdRouteWithChildren,
   AuthenticatedELearningDepartmentIdIndexRoute:
     AuthenticatedELearningDepartmentIdIndexRoute,
+  AuthenticatedELearningDepartmentIdCourseIdContentIdRoute:
+    AuthenticatedELearningDepartmentIdCourseIdContentIdRoute,
+  AuthenticatedELearningDepartmentIdCourseIdIndexRoute:
+    AuthenticatedELearningDepartmentIdCourseIdIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

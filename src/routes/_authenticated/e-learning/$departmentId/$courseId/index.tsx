@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import type { CourseContent, ContentType } from '#/types/elearning'
 
-export const Route = createFileRoute('/_authenticated/e-learning/$departmentId/$courseId')({
+export const Route = createFileRoute('/_authenticated/e-learning/$departmentId/$courseId/')({
   component: CourseDetail,
 })
 
@@ -81,7 +81,6 @@ function CourseDetail() {
         <ArrowLeft className="w-3.5 h-3.5" />
         {department.name}
       </Link>
-
       {/* Course Header */}
       <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
         <div className="flex items-start justify-between gap-4 mb-3">
@@ -118,7 +117,6 @@ function CourseDetail() {
           <p className="text-xs text-gray-400">{course.assessmentCriteria}</p>
         </div>
       </div>
-
       {/* Content Section */}
       {courseAccessible ? (
         <>
@@ -231,7 +229,7 @@ function CourseDetail() {
         </>
       ) : (
         /* Locked Course */
-        <ContentLock requiredLevel={course.clearanceLevel}>
+        (<ContentLock requiredLevel={course.clearanceLevel}>
           <div className="bg-white rounded-xl border border-gray-100 p-8">
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -245,7 +243,7 @@ function CourseDetail() {
               ))}
             </div>
           </div>
-        </ContentLock>
+        </ContentLock>)
       )}
     </div>
   )
