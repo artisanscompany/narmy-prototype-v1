@@ -77,6 +77,7 @@ export function AppSidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white text-[13px] font-semibold truncate">{user.name}</div>
+            <div className="text-white/30 text-[10px] font-mono truncate">{user.armyNumber}</div>
           </div>
         </div>
         <button
