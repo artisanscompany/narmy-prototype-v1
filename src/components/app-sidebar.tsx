@@ -1,7 +1,7 @@
 import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useAuth } from '#/contexts/AuthContext'
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter,
 } from '#/components/ui/sidebar'
 import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, Users, Shield, LogOut, UserRound } from 'lucide-react'
@@ -11,6 +11,7 @@ const personnelItems = [
   { label: 'Pay & Documents', to: '/pay', icon: Wallet },
   { label: 'Complaints', to: '/complaints', icon: MessageCircle },
   { label: 'Help & Support', to: '/help', icon: HelpCircle },
+  { label: 'Profile', to: '/profile', icon: UserRound },
 ]
 
 const adminItems = [
@@ -19,6 +20,7 @@ const adminItems = [
   { label: 'Analytics', to: '/admin/analytics', icon: BarChart3 },
   { label: 'User Management', to: '/admin/users', icon: Users },
   { label: 'RBAC Matrix', to: '/admin/rbac', icon: Shield },
+  { label: 'Profile', to: '/profile', icon: UserRound },
 ]
 
 export function AppSidebar() {
@@ -28,8 +30,6 @@ export function AppSidebar() {
   if (!user) return null
 
   const items = user.role === 'personnel' ? personnelItems : adminItems
-  const sectionLabel = user.role === 'personnel' ? 'Personnel' : 'Administration'
-  const isProfileActive = matchRoute({ to: '/profile', fuzzy: true })
 
   return (
     <Sidebar className="border-r-0">
@@ -49,9 +49,6 @@ export function AppSidebar() {
 
       <SidebarContent className="px-3 py-4">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-[0.2em] text-army-gold/50 px-3 mb-2">
-            {sectionLabel}
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-0.5">
               {items.map((item) => {
@@ -74,31 +71,14 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-white/[0.08] px-3 py-3">
-        {/* Profile link — separated from main nav */}
-        <Link
-          to="/profile"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 mb-3 relative ${
-            isProfileActive
-              ? 'bg-white/[0.12] text-white font-semibold'
-              : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
-          }`}
-        >
-          {isProfileActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-army-gold" />}
-          <div className={`w-8 h-8 bg-linear-to-br from-army-mid to-army rounded-lg flex items-center justify-center text-white text-[11px] font-bold ring-1 ${isProfileActive ? 'ring-army-gold/30' : 'ring-white/10'}`}>
+        <div className="flex items-center gap-3 px-2 mb-2">
+          <div className="w-9 h-9 bg-linear-to-br from-army-mid to-army rounded-lg flex items-center justify-center text-white text-xs font-bold ring-1 ring-white/10">
             {user.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[13px] truncate">{user.name}</div>
-            <div className={`text-[10px] truncate ${isProfileActive ? 'text-white/50' : 'text-white/30'}`}>
-              {user.rank}
-              <span className="mx-1 text-white/20">·</span>
-              <span className="font-mono">{user.armyNumber}</span>
-            </div>
+            <div className="text-white text-[13px] font-semibold truncate">{user.name}</div>
           </div>
-          <UserRound className={`w-4 h-4 shrink-0 ${isProfileActive ? 'text-army-gold' : 'text-white/25'}`} />
-        </Link>
-
-        {/* Sign out */}
+        </div>
         <button
           onClick={logout}
           className="flex items-center gap-2.5 text-white/35 hover:text-red-400 text-xs w-full px-3 py-2 rounded-lg hover:bg-white/[0.06] transition-colors"
