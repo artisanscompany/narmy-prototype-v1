@@ -189,13 +189,18 @@ function CourseDetail() {
               }
 
               return (
-                <div key={item.id} className="bg-white rounded-xl border border-gray-100 px-5 py-3.5 hover:border-gray-200 transition-colors">
+                <Link
+                  key={item.id}
+                  to="/e-learning/$departmentId/$courseId/$contentId"
+                  params={{ departmentId, courseId, contentId: item.id }}
+                  className="block bg-white rounded-xl border border-gray-100 px-5 py-3.5 hover:border-army-gold/20 hover:shadow-sm transition-all group"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-army-dark/5 flex items-center justify-center shrink-0">
                       <Icon className="w-4 h-4 text-army" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-army-dark truncate">{item.title}</p>
+                      <p className="text-sm font-semibold text-army-dark group-hover:text-army truncate transition-colors">{item.title}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {item.uploadedBy} · {item.uploadDate} · {item.fileSize}
                         {item.clearanceLevel !== 'all_ranks' && <> · <ClearanceBadge level={item.clearanceLevel} /></>}
@@ -203,8 +208,8 @@ function CourseDetail() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
-                        onClick={() => toggleContentCompletion(user.id, course.id, item.id)}
-                        className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleContentCompletion(user.id, course.id, item.id) }}
+                        className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                         title={isCompleted ? 'Mark incomplete' : 'Mark complete'}
                       >
                         {isCompleted ? (
@@ -213,16 +218,10 @@ function CourseDetail() {
                           <Square className="w-4 h-4 text-gray-300" />
                         )}
                       </button>
-                      <Link
-                        to="/e-learning/$departmentId/$courseId/$contentId"
-                        params={{ departmentId, courseId, contentId: item.id }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-army-gold bg-army-gold/8 rounded-lg hover:bg-army-gold/15 transition-colors"
-                      >
-                        Read <ArrowUpRight className="w-3 h-3" />
-                      </Link>
+                      <ArrowUpRight className="w-4 h-4 text-gray-200 group-hover:text-army-gold transition-colors" />
                     </div>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
