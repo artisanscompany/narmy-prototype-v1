@@ -18,6 +18,7 @@ import { Route as AuthenticatedPersonnelRouteImport } from './routes/_authentica
 import { Route as AuthenticatedELearningIndexRouteImport } from './routes/_authenticated/e-learning/index'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminRbacRouteImport } from './routes/_authenticated/admin/rbac'
+import { Route as AuthenticatedAdminPayrollRouteImport } from './routes/_authenticated/admin/payroll'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedPersonnelPayRouteImport } from './routes/_authenticated/_personnel/pay'
@@ -26,6 +27,7 @@ import { Route as AuthenticatedPersonnelDashboardRouteImport } from './routes/_a
 import { Route as AuthenticatedELearningDepartmentIdIndexRouteImport } from './routes/_authenticated/e-learning/$departmentId/index'
 import { Route as AuthenticatedAdminTicketsIndexRouteImport } from './routes/_authenticated/admin/tickets/index'
 import { Route as AuthenticatedPersonnelComplaintsIndexRouteImport } from './routes/_authenticated/_personnel/complaints/index'
+import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users/$userId'
 import { Route as AuthenticatedAdminTicketsTicketIdRouteImport } from './routes/_authenticated/admin/tickets/$ticketId'
 import { Route as AuthenticatedPersonnelComplaintsNewRouteImport } from './routes/_authenticated/_personnel/complaints/new'
 import { Route as AuthenticatedPersonnelComplaintsComplaintIdRouteImport } from './routes/_authenticated/_personnel/complaints/$complaintId'
@@ -76,6 +78,12 @@ const AuthenticatedAdminRbacRoute = AuthenticatedAdminRbacRouteImport.update({
   path: '/rbac',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminPayrollRoute =
+  AuthenticatedAdminPayrollRouteImport.update({
+    id: '/payroll',
+    path: '/payroll',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminDashboardRoute =
   AuthenticatedAdminDashboardRouteImport.update({
     id: '/dashboard',
@@ -124,6 +132,12 @@ const AuthenticatedPersonnelComplaintsIndexRoute =
     path: '/complaints/',
     getParentRoute: () => AuthenticatedPersonnelRoute,
   } as any)
+const AuthenticatedAdminUsersUserIdRoute =
+  AuthenticatedAdminUsersUserIdRouteImport.update({
+    id: '/$userId',
+    path: '/$userId',
+    getParentRoute: () => AuthenticatedAdminUsersRoute,
+  } as any)
 const AuthenticatedAdminTicketsTicketIdRoute =
   AuthenticatedAdminTicketsTicketIdRouteImport.update({
     id: '/tickets/$ticketId',
@@ -165,12 +179,14 @@ export interface FileRoutesByFullPath {
   '/pay': typeof AuthenticatedPersonnelPayRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/payroll': typeof AuthenticatedAdminPayrollRoute
   '/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/e-learning/': typeof AuthenticatedELearningIndexRoute
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/admin/tickets/$ticketId': typeof AuthenticatedAdminTicketsTicketIdRoute
+  '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
   '/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
@@ -187,12 +203,14 @@ export interface FileRoutesByTo {
   '/pay': typeof AuthenticatedPersonnelPayRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/payroll': typeof AuthenticatedAdminPayrollRoute
   '/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/e-learning': typeof AuthenticatedELearningIndexRoute
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/admin/tickets/$ticketId': typeof AuthenticatedAdminTicketsTicketIdRoute
+  '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/complaints': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/admin/tickets': typeof AuthenticatedAdminTicketsIndexRoute
   '/e-learning/$departmentId': typeof AuthenticatedELearningDepartmentIdIndexRoute
@@ -212,12 +230,14 @@ export interface FileRoutesById {
   '/_authenticated/_personnel/pay': typeof AuthenticatedPersonnelPayRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/payroll': typeof AuthenticatedAdminPayrollRoute
   '/_authenticated/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/_authenticated/e-learning/': typeof AuthenticatedELearningIndexRoute
   '/_authenticated/_personnel/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/_authenticated/_personnel/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/_authenticated/admin/tickets/$ticketId': typeof AuthenticatedAdminTicketsTicketIdRoute
+  '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/_personnel/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/_authenticated/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
   '/_authenticated/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
@@ -236,12 +256,14 @@ export interface FileRouteTypes {
     | '/pay'
     | '/admin/analytics'
     | '/admin/dashboard'
+    | '/admin/payroll'
     | '/admin/rbac'
     | '/admin/users'
     | '/e-learning/'
     | '/complaints/$complaintId'
     | '/complaints/new'
     | '/admin/tickets/$ticketId'
+    | '/admin/users/$userId'
     | '/complaints/'
     | '/admin/tickets/'
     | '/e-learning/$departmentId/'
@@ -258,12 +280,14 @@ export interface FileRouteTypes {
     | '/pay'
     | '/admin/analytics'
     | '/admin/dashboard'
+    | '/admin/payroll'
     | '/admin/rbac'
     | '/admin/users'
     | '/e-learning'
     | '/complaints/$complaintId'
     | '/complaints/new'
     | '/admin/tickets/$ticketId'
+    | '/admin/users/$userId'
     | '/complaints'
     | '/admin/tickets'
     | '/e-learning/$departmentId'
@@ -282,12 +306,14 @@ export interface FileRouteTypes {
     | '/_authenticated/_personnel/pay'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/payroll'
     | '/_authenticated/admin/rbac'
     | '/_authenticated/admin/users'
     | '/_authenticated/e-learning/'
     | '/_authenticated/_personnel/complaints/$complaintId'
     | '/_authenticated/_personnel/complaints/new'
     | '/_authenticated/admin/tickets/$ticketId'
+    | '/_authenticated/admin/users/$userId'
     | '/_authenticated/_personnel/complaints/'
     | '/_authenticated/admin/tickets/'
     | '/_authenticated/e-learning/$departmentId/'
@@ -365,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRbacRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/payroll': {
+      id: '/_authenticated/admin/payroll'
+      path: '/payroll'
+      fullPath: '/admin/payroll'
+      preLoaderRoute: typeof AuthenticatedAdminPayrollRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/dashboard': {
       id: '/_authenticated/admin/dashboard'
       path: '/dashboard'
@@ -420,6 +453,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/complaints/'
       preLoaderRoute: typeof AuthenticatedPersonnelComplaintsIndexRouteImport
       parentRoute: typeof AuthenticatedPersonnelRoute
+    }
+    '/_authenticated/admin/users/$userId': {
+      id: '/_authenticated/admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
+      parentRoute: typeof AuthenticatedAdminUsersRoute
     }
     '/_authenticated/admin/tickets/$ticketId': {
       id: '/_authenticated/admin/tickets/$ticketId'
@@ -486,11 +526,26 @@ const AuthenticatedPersonnelRouteWithChildren =
     AuthenticatedPersonnelRouteChildren,
   )
 
+interface AuthenticatedAdminUsersRouteChildren {
+  AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
+}
+
+const AuthenticatedAdminUsersRouteChildren: AuthenticatedAdminUsersRouteChildren =
+  {
+    AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
+  }
+
+const AuthenticatedAdminUsersRouteWithChildren =
+  AuthenticatedAdminUsersRoute._addFileChildren(
+    AuthenticatedAdminUsersRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminPayrollRoute: typeof AuthenticatedAdminPayrollRoute
   AuthenticatedAdminRbacRoute: typeof AuthenticatedAdminRbacRoute
-  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminTicketsTicketIdRoute: typeof AuthenticatedAdminTicketsTicketIdRoute
   AuthenticatedAdminTicketsIndexRoute: typeof AuthenticatedAdminTicketsIndexRoute
 }
@@ -498,8 +553,9 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminPayrollRoute: AuthenticatedAdminPayrollRoute,
   AuthenticatedAdminRbacRoute: AuthenticatedAdminRbacRoute,
-  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminTicketsTicketIdRoute:
     AuthenticatedAdminTicketsTicketIdRoute,
   AuthenticatedAdminTicketsIndexRoute: AuthenticatedAdminTicketsIndexRoute,

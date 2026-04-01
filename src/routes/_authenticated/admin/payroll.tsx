@@ -217,7 +217,8 @@ function AdminPayroll() {
             return (
               <Link
                 key={slip.id}
-                to="/admin/users"
+                to="/admin/users/$userId"
+                params={{ userId: slip.userId }}
                 className="block bg-white rounded-xl border border-gray-100 px-5 py-3.5 hover:border-army-gold/20 hover:shadow-sm transition-all group"
               >
                 <div className="flex items-center gap-4">
