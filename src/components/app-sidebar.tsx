@@ -4,10 +4,11 @@ import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter,
 } from '#/components/ui/sidebar'
-import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, Users, Shield, LogOut, UserRound } from 'lucide-react'
+import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, Users, Shield, LogOut, UserRound, GraduationCap } from 'lucide-react'
 
 const personnelItems = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+  { label: 'E-Learning', to: '/e-learning', icon: GraduationCap },
   { label: 'Pay & Documents', to: '/pay', icon: Wallet },
   { label: 'Complaints', to: '/complaints', icon: MessageCircle },
   { label: 'Help & Support', to: '/help', icon: HelpCircle },
@@ -16,6 +17,7 @@ const personnelItems = [
 
 const adminItems = [
   { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'E-Learning', to: '/e-learning', icon: GraduationCap },
   { label: 'Ticket Management', to: '/admin/tickets', icon: Ticket },
   { label: 'Analytics', to: '/admin/analytics', icon: BarChart3 },
   { label: 'User Management', to: '/admin/users', icon: Users },
