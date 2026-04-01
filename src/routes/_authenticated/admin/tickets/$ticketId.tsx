@@ -64,7 +64,7 @@ function AdminTicketDetail() {
   const canRequestInfo = availableStatuses.includes('needs-more-info')
 
   const sortedTimeline = [...ticket.timeline].sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
   )
 
   const handleNoteFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,7 +97,10 @@ function AdminTicketDetail() {
       source: 'response' as const,
       uploadedAt: new Date().toISOString(),
     }))
-    addNote(ticket.id, noteText, user.name, attachmentsWithMeta.length > 0 ? attachmentsWithMeta : undefined)
+    const fileNames = attachmentsWithMeta.map(a => a.name).join(', ')
+    const message = noteText.trim() || (attachmentsWithMeta.length > 0 ? `Attached: ${fileNames}` : '')
+    if (!message) return
+    addNote(ticket.id, message, user.name, attachmentsWithMeta.length > 0 ? attachmentsWithMeta : undefined)
     setNoteText('')
     setNoteAttachments([])
     toast.success('Response added')

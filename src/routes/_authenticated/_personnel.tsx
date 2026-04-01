@@ -13,21 +13,20 @@ function PersonnelLayout() {
 
   useEffect(() => {
     if (!user) return
-
-    // Redirect non-personnel users to admin dashboard
     if (user.role !== 'personnel') {
       navigate({ to: '/admin/dashboard' })
       return
     }
-
-    // AWOL users can only access complaints
     if (user.status === 'awol') {
       const isComplaintsRoute = matchRoute({ to: '/complaints', fuzzy: true })
-      if (!isComplaintsRoute) {
-        navigate({ to: '/complaints' })
-      }
+      if (!isComplaintsRoute) navigate({ to: '/complaints' })
     }
   }, [user, navigate, matchRoute])
+
+  // Block render until redirect fires
+  if (!user) return null
+  if (user.role !== 'personnel') return null
+  if (user.status === 'awol' && !matchRoute({ to: '/complaints', fuzzy: true })) return null
 
   return <Outlet />
 }

@@ -197,7 +197,7 @@ function PayDocumentsPage() {
                         ) : (
                           <span className="text-green-600 font-medium">Paid</span>
                         )}
-                        {p.paidDate && ` · ${new Date(p.paidDate).getDate()} ${monthNamesShort[p.month]}`}
+                        {p.paidDate && ` · ${new Date(p.paidDate).getUTCDate()} ${monthNamesShort[p.month]}`}
                       </p>
                     </div>
                   </div>
