@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { SEED_COMPLAINTS } from '#/data/complaints'
+import { SEED_PROGRESS } from '#/data/elearning'
 import { PAYSLIPS } from '#/data/payslips'
 import { DEMO_USERS } from '#/data/users'
 import { loadFromStorage, saveToStorage } from '#/lib/localStorage'
-import type { Complaint, ComplaintStatus, TimelineEvent } from '#/types/complaint'
+import type { Complaint, ComplaintStatus, TimelineEvent, Attachment } from '#/types/complaint'
+import type { CourseProgress } from '#/types/elearning'
 import type { Payslip } from '#/types/payslip'
 import type { User, UserRole } from '#/types/user'
 
@@ -11,13 +13,17 @@ interface DataContextValue {
   complaints: Complaint[]
   payslips: Payslip[]
   users: User[]
+  elearningProgress: CourseProgress[]
   addComplaint: (complaint: Complaint) => void
   updateComplaintStatus: (complaintId: string, newStatus: ComplaintStatus, actor: string, note: string) => void
-  addNote: (complaintId: string, note: string, actor: string) => void
+  addNote: (complaintId: string, note: string, actor: string, attachments?: Attachment[]) => void
   updateUserRole: (userId: string, newRole: UserRole) => void
   getComplaintsForUser: (userId: string) => Complaint[]
   getComplaintsForDivision: (division: string) => Complaint[]
   getPayslipsForUser: (userId: string) => Payslip[]
+  toggleContentCompletion: (userId: string, courseId: string, contentId: string) => void
+  toggleBookmark: (userId: string, courseId: string) => void
+  getProgressForUser: (userId: string) => CourseProgress[]
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
@@ -28,10 +34,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
   )
   const [payslips] = useState<Payslip[]>(() => loadFromStorage('payslips', PAYSLIPS))
   const [users, setUsers] = useState<User[]>(() => loadFromStorage('users', DEMO_USERS))
+  const [elearningProgress, setElearningProgress] = useState<CourseProgress[]>(() =>
+    loadFromStorage('elearning_progress', SEED_PROGRESS),
+  )
 
   const persistComplaints = (updated: Complaint[]) => {
     setComplaints(updated)
     saveToStorage('complaints', updated)
+  }
+
+  const persistProgress = (updated: CourseProgress[]) => {
+    setElearningProgress(updated)
+    saveToStorage('elearning_progress', updated)
   }
 
   const addComplaint = useCallback(
@@ -62,7 +76,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   )
 
   const addNote = useCallback(
-    (complaintId: string, note: string, actor: string) => {
+    (complaintId: string, note: string, actor: string, noteAttachments?: Attachment[]) => {
       const updated = complaints.map((c) => {
         if (c.id !== complaintId) return c
         const event: TimelineEvent = {
@@ -72,7 +86,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
           description: note,
           actor,
         }
-        return { ...c, lastUpdated: event.timestamp, timeline: [...c.timeline, event] }
+        const existingAttachments = c.attachments ?? []
+        const newAttachments = noteAttachments && noteAttachments.length > 0
+          ? [...existingAttachments, ...noteAttachments]
+          : existingAttachments
+        return {
+          ...c,
+          lastUpdated: event.timestamp,
+          timeline: [...c.timeline, event],
+          attachments: newAttachments.length > 0 ? newAttachments : undefined,
+        }
       })
       persistComplaints(updated)
     },
@@ -103,11 +126,67 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [payslips],
   )
 
+  const toggleContentCompletion = useCallback(
+    (userId: string, courseId: string, contentId: string) => {
+      const existing = elearningProgress.find((p) => p.userId === userId && p.courseId === courseId)
+      if (existing) {
+        const completed = existing.completedContentIds.includes(contentId)
+          ? existing.completedContentIds.filter((id) => id !== contentId)
+          : [...existing.completedContentIds, contentId]
+        const updated = elearningProgress.map((p) =>
+          p.userId === userId && p.courseId === courseId
+            ? { ...p, completedContentIds: completed, lastAccessedDate: new Date().toISOString().split('T')[0] }
+            : p,
+        )
+        persistProgress(updated)
+      } else {
+        const newProgress: CourseProgress = {
+          userId,
+          courseId,
+          completedContentIds: [contentId],
+          bookmarked: false,
+          lastAccessedDate: new Date().toISOString().split('T')[0],
+        }
+        persistProgress([...elearningProgress, newProgress])
+      }
+    },
+    [elearningProgress],
+  )
+
+  const toggleBookmark = useCallback(
+    (userId: string, courseId: string) => {
+      const existing = elearningProgress.find((p) => p.userId === userId && p.courseId === courseId)
+      if (existing) {
+        const updated = elearningProgress.map((p) =>
+          p.userId === userId && p.courseId === courseId ? { ...p, bookmarked: !p.bookmarked } : p,
+        )
+        persistProgress(updated)
+      } else {
+        const newProgress: CourseProgress = {
+          userId,
+          courseId,
+          completedContentIds: [],
+          bookmarked: true,
+          lastAccessedDate: new Date().toISOString().split('T')[0],
+        }
+        persistProgress([...elearningProgress, newProgress])
+      }
+    },
+    [elearningProgress],
+  )
+
+  const getProgressForUser = useCallback(
+    (userId: string) => elearningProgress.filter((p) => p.userId === userId),
+    [elearningProgress],
+  )
+
   return (
     <DataContext.Provider
       value={{
-        complaints, payslips, users, addComplaint, updateComplaintStatus,
+        complaints, payslips, users, elearningProgress,
+        addComplaint, updateComplaintStatus,
         addNote, updateUserRole, getComplaintsForUser, getComplaintsForDivision, getPayslipsForUser,
+        toggleContentCompletion, toggleBookmark, getProgressForUser,
       }}
     >
       {children}
