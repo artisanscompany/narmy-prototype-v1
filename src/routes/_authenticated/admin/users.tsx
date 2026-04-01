@@ -1,10 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useAuth } from '#/contexts/AuthContext'
 import { useData } from '#/contexts/DataContext'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { Input } from '#/components/ui/input'
 import { useState, useMemo } from 'react'
-import { Search, Shield, ShieldCheck, User as UserIcon } from 'lucide-react'
+import { Search, ChevronRight, X } from 'lucide-react'
 import type { UserRole } from '#/types/user'
 
 export const Route = createFileRoute('/_authenticated/admin/users')({
@@ -17,22 +15,25 @@ const ROLE_LABELS: Record<UserRole, string> = {
   superAdmin: 'Super Admin',
 }
 
-const ROLE_ICONS: Record<UserRole, typeof UserIcon> = {
-  personnel: UserIcon,
-  divisionAdmin: Shield,
-  superAdmin: ShieldCheck,
-}
-
 const ALL_ROLES: UserRole[] = ['personnel', 'divisionAdmin', 'superAdmin']
 
 function AdminUsers() {
   const { user } = useAuth()
-  const { users, updateUserRole } = useData()
+  const { users } = useData()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all')
 
+  if (!user) return null
+
+  const isSuperAdmin = user.role === 'superAdmin'
+
+  const scopedUsers = useMemo(() => {
+    if (isSuperAdmin) return users
+    return users.filter((u) => u.division === user.division)
+  }, [users, isSuperAdmin, user.division])
+
   const filtered = useMemo(() => {
-    let list = users
+    let list = scopedUsers
 
     if (roleFilter !== 'all') {
       list = list.filter((u) => u.role === roleFilter)
@@ -44,121 +45,133 @@ function AdminUsers() {
         (u) =>
           u.name.toLowerCase().includes(q) ||
           u.armyNumber.toLowerCase().includes(q) ||
-          u.division.toLowerCase().includes(q) ||
-          u.rank.toLowerCase().includes(q),
+          u.rank.toLowerCase().includes(q) ||
+          u.division.toLowerCase().includes(q),
       )
     }
 
     return list
-  }, [users, roleFilter, search])
+  }, [scopedUsers, roleFilter, search])
 
-  if (!user) return null
-
-  const isSuperAdmin = user.role === 'superAdmin'
+  const roleCounts = useMemo(() => {
+    return ALL_ROLES.reduce<Record<UserRole, number>>(
+      (acc, role) => {
+        acc[role] = scopedUsers.filter((u) => u.role === role).length
+        return acc
+      },
+      { personnel: 0, divisionAdmin: 0, superAdmin: 0 },
+    )
+  }, [scopedUsers])
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-army-dark">User Management</h1>
-          <p className="text-gray-500 text-sm mt-1">{filtered.length} users</p>
-        </div>
+    <div className="max-w-3xl mx-auto space-y-3">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-army-dark">User Management</h1>
+        <p className="text-sm text-gray-400 mt-0.5">{filtered.length} users</p>
       </div>
 
-      <Card className="mb-4">
-        <CardContent className="pt-4 pb-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Search by name, army number, division, rank..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value as UserRole | 'all')}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
-            >
-              <option value="all">All Roles</option>
-              {ALL_ROLES.map((r) => (
-                <option key={r} value={r}>{ROLE_LABELS[r]}</option>
-              ))}
-            </select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+        <input
+          placeholder="Search by name, army number, rank..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-army/15 focus:border-army/30 transition-all"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
-      <Card>
-        <CardHeader><CardTitle className="text-base">Users</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-gray-50/50">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Name</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Army Number</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Rank</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Division</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Status</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((u) => {
-                  const RoleIcon = ROLE_ICONS[u.role]
-                  return (
-                    <tr key={u.id} className="border-b last:border-b-0 hover:bg-gray-50/50 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-gray-900">{u.name}</div>
-                        <div className="text-xs text-gray-400">{u.corps}</div>
-                      </td>
-                      <td className="px-4 py-3 text-gray-600 font-mono text-xs">{u.armyNumber}</td>
-                      <td className="px-4 py-3 text-gray-600">{u.rank}</td>
-                      <td className="px-4 py-3 text-gray-600">{u.division}</td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                          u.status === 'active' ? 'bg-green-100 text-green-700' :
-                          u.status === 'awol' ? 'bg-red-100 text-red-700' :
-                          u.status === 'retired' ? 'bg-gray-100 text-gray-600' :
-                          'bg-orange-100 text-orange-700'
-                        }`}>
-                          {u.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {isSuperAdmin && u.id !== user.id ? (
-                          <select
-                            value={u.role}
-                            onChange={(e) => updateUserRole(u.id, e.target.value as UserRole)}
-                            className="border border-gray-200 rounded-lg px-2 py-1 text-xs bg-white"
-                          >
-                            {ALL_ROLES.map((r) => (
-                              <option key={r} value={r}>{ROLE_LABELS[r]}</option>
-                            ))}
-                          </select>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-700">
-                            <RoleIcon className="w-3.5 h-3.5" />
-                            {ROLE_LABELS[u.role]}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-gray-400">No users match your filters.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+      {/* Role Filter Pills */}
+      <div className="flex gap-1.5 flex-wrap mt-2">
+        <button
+          onClick={() => setRoleFilter('all')}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+            roleFilter === 'all'
+              ? 'bg-army-dark text-white'
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          }`}
+        >
+          All ({scopedUsers.length})
+        </button>
+        {ALL_ROLES.map((role) => (
+          <button
+            key={role}
+            onClick={() => setRoleFilter(role)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+              roleFilter === role
+                ? 'bg-army-dark text-white'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            }`}
+          >
+            {ROLE_LABELS[role]} ({roleCounts[role]})
+          </button>
+        ))}
+      </div>
+
+      {/* User Cards */}
+      <div className="space-y-2 mt-3">
+        {filtered.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-100 px-6 py-12 text-center">
+            <p className="text-sm text-gray-400">No users match your filters.</p>
           </div>
-        </CardContent>
-      </Card>
+        ) : (
+          filtered.map((u) => {
+            const statusClasses =
+              u.status === 'active'
+                ? 'bg-green-50 text-green-700'
+                : u.status === 'awol'
+                  ? 'bg-red-50 text-red-700'
+                  : u.status === 'retired'
+                    ? 'bg-gray-100 text-gray-600'
+                    : 'bg-orange-50 text-orange-700'
+
+            return (
+              <Link
+                key={u.id}
+                to="/admin/users/$userId"
+                params={{ userId: u.id }}
+                className="block bg-white rounded-xl border border-gray-100 px-5 py-3.5 hover:border-army-gold/20 hover:shadow-sm transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-army-dark">{u.name}</p>
+                    <p className="text-xs text-gray-400">
+                      <span className="font-mono">{u.armyNumber}</span> · {u.rank} · {u.corps}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${statusClasses}`}>
+                      {u.status === 'awol'
+                        ? 'AWOL'
+                        : u.status.charAt(0).toUpperCase() + u.status.slice(1)}
+                    </span>
+                    {isSuperAdmin && (
+                      <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                        {u.division}
+                      </span>
+                    )}
+                    {isSuperAdmin && (
+                      <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        {ROLE_LABELS[u.role]}
+                      </span>
+                    )}
+                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-army-gold transition-colors" />
+                  </div>
+                </div>
+              </Link>
+            )
+          })
+        )}
+      </div>
     </div>
   )
 }
