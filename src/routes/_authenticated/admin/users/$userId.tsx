@@ -12,6 +12,7 @@ import {
   DialogFooter,
 } from '#/components/ui/dialog'
 import { Button } from '#/components/ui/button'
+import { toast } from 'sonner'
 import {
   ArrowLeft,
   Lock,
@@ -24,20 +25,16 @@ import {
   Calendar,
   ChevronDown,
   Upload,
-  Plus,
-  Minus,
   Settings,
   AlertTriangle,
 } from 'lucide-react'
 import type { UserRole, ServiceStatus } from '#/types/user'
-import type { Payslip, PayComponent, PayslipStatus } from '#/types/payslip'
 
 export const Route = createFileRoute('/_authenticated/admin/users/$userId')({
   component: AdminUserDetail,
 })
 
 const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const MONTH_NAMES_FULL = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 const SENSITIVE_FIELDS = ['nin', 'bvn', 'salaryAccountNo'] as const
 type SensitiveField = (typeof SENSITIVE_FIELDS)[number]
@@ -53,7 +50,7 @@ const DEMO_DECRYPT_PIN = '0000'
 function AdminUserDetail() {
   const { userId } = Route.useParams()
   const { user: currentUser } = useAuth()
-  const { users, getPayslipsForUser, updateUserStatus, updateUserRole, addPayslip } = useData()
+  const { users, getPayslipsForUser, updateUserStatus, updateUserRole } = useData()
 
   // Sensitive reveal state
   const [revealedFields, setRevealedFields] = useState<Set<SensitiveField>>(new Set())
@@ -69,17 +66,19 @@ function AdminUserDetail() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [yearFilter, setYearFilter] = useState<number | 'all'>('all')
 
-  // Upload modal state
-  const [showUpload, setShowUpload] = useState(false)
-  const [uploadMonth, setUploadMonth] = useState<number>(new Date().getMonth() + 1)
-  const [uploadYear, setUploadYear] = useState<number>(new Date().getFullYear())
-  const [uploadComponents, setUploadComponents] = useState<PayComponent[]>([
-    { label: 'Basic Salary', amount: 0, type: 'earning' },
-  ])
-  const [uploadStatus, setUploadStatus] = useState<PayslipStatus>('paid')
-  const [uploadDiscrepancy, setUploadDiscrepancy] = useState('')
-
   const targetUser = users.find((u) => u.id === userId)
+
+  // Division admin scope check — can only view users in their division
+  if (targetUser && currentUser?.role === 'divisionAdmin' && targetUser.division !== currentUser.division) {
+    return (
+      <div className="max-w-3xl mx-auto py-16 text-center">
+        <p className="text-sm text-gray-500 mb-3">You do not have access to this user's profile</p>
+        <Link to="/admin/users" className="text-sm text-army font-semibold hover:text-army-gold transition-colors">
+          Back to Users
+        </Link>
+      </div>
+    )
+  }
 
   // Initialize action states when targetUser loads
   const resolvedStatus = newStatus ?? targetUser?.status ?? 'active'
@@ -215,11 +214,14 @@ function AdminUserDetail() {
   function handleStatusUpdate() {
     if (!targetUser) return
     updateUserStatus(targetUser.id, resolvedStatus)
+    const label = resolvedStatus === 'awol' ? 'AWOL' : resolvedStatus.charAt(0).toUpperCase() + resolvedStatus.slice(1)
+    toast.success(`Status updated to ${label}`)
   }
 
   function handleRoleUpdate() {
     if (!targetUser) return
     updateUserRole(targetUser.id, resolvedRole)
+    toast.success(`Role updated to ${roleLabel(resolvedRole)}`)
   }
 
   const roleLabel = (role: UserRole) =>
@@ -233,49 +235,6 @@ function AdminUserDetail() {
       else next.add(id)
       return next
     })
-  }
-
-  // Upload modal helpers
-  const uploadEarnings = uploadComponents.filter((c) => c.type === 'earning')
-  const uploadDeductions = uploadComponents.filter((c) => c.type === 'deduction')
-  const uploadGross = uploadEarnings.reduce((s, c) => s + (c.amount || 0), 0)
-  const uploadTotalDeductions = uploadDeductions.reduce((s, c) => s + (c.amount || 0), 0)
-  const uploadNet = uploadGross - uploadTotalDeductions
-
-  function addComponent(type: 'earning' | 'deduction') {
-    setUploadComponents((prev) => [...prev, { label: '', amount: 0, type }])
-  }
-
-  function removeComponent(index: number) {
-    setUploadComponents((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  function updateComponent(index: number, field: keyof PayComponent, value: string | number) {
-    setUploadComponents((prev) =>
-      prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)),
-    )
-  }
-
-  function handleUploadSave() {
-    if (!targetUser) return
-    const payslip: Payslip = {
-      id: `ps-${Date.now()}`,
-      userId: targetUser.id,
-      month: uploadMonth,
-      year: uploadYear,
-      components: uploadComponents,
-      grossPay: uploadGross,
-      totalDeductions: uploadTotalDeductions,
-      netPay: uploadNet,
-      status: uploadStatus,
-      paidDate: uploadStatus !== 'pending' ? new Date().toISOString().split('T')[0] : null,
-      discrepancyNote: uploadStatus === 'short-paid' && uploadDiscrepancy ? uploadDiscrepancy : null,
-    }
-    addPayslip(payslip)
-    setShowUpload(false)
-    setUploadComponents([{ label: 'Basic Salary', amount: 0, type: 'earning' }])
-    setUploadStatus('paid')
-    setUploadDiscrepancy('')
   }
 
   return (
@@ -410,58 +369,81 @@ function AdminUserDetail() {
           </div>
           <h3 className="text-sm font-bold text-army-dark">Admin Actions</h3>
         </div>
-        <div className="px-5 pb-5">
+        <div className="px-5 pb-4 space-y-0">
           {/* Change Status */}
-          <div className="flex items-center justify-between py-3 border-b border-gray-50">
-            <span className="text-xs font-medium text-gray-400">Service Status</span>
-            {canChangeStatus ? (
-              <div className="flex items-center gap-0">
-                <select
-                  value={resolvedStatus}
-                  onChange={(e) => setNewStatus(e.target.value as ServiceStatus)}
-                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white text-army-dark focus:outline-none focus:ring-1 focus:ring-army/20"
-                >
-                  <option value="active">Active</option>
-                  <option value="awol">AWOL</option>
-                  <option value="suspended">Suspended</option>
-                  <option value="retired">Retired</option>
-                </select>
-                <button
-                  onClick={handleStatusUpdate}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-dark text-white hover:bg-army-dark/90 transition-colors ml-2"
-                >
-                  Update
-                </button>
+          <div className="rounded-lg border border-gray-100 px-4 py-3 mb-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-1">Service Status</p>
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                  resolvedStatus === 'active' ? 'bg-green-50 text-green-700' :
+                  resolvedStatus === 'awol' ? 'bg-red-50 text-red-700' :
+                  resolvedStatus === 'retired' ? 'bg-gray-100 text-gray-600' :
+                  'bg-orange-50 text-orange-700'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    resolvedStatus === 'active' ? 'bg-green-500' :
+                    resolvedStatus === 'awol' ? 'bg-red-500' :
+                    resolvedStatus === 'retired' ? 'bg-gray-400' :
+                    'bg-orange-500'
+                  }`} />
+                  {resolvedStatus === 'awol' ? 'AWOL' : resolvedStatus.charAt(0).toUpperCase() + resolvedStatus.slice(1)}
+                </span>
               </div>
-            ) : (
-              <span className="text-xs font-semibold text-army-dark">{statusLabel}</span>
-            )}
+              {canChangeStatus && (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={resolvedStatus}
+                    onChange={(e) => setNewStatus(e.target.value as ServiceStatus)}
+                    className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white text-army-dark focus:outline-none focus:ring-2 focus:ring-army/15"
+                  >
+                    <option value="active">Active</option>
+                    <option value="awol">AWOL</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="retired">Retired</option>
+                  </select>
+                  <button
+                    onClick={handleStatusUpdate}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-dark text-white hover:bg-army-dark/90 transition-colors"
+                  >
+                    Update
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Change Role */}
-          <div className="flex items-center justify-between py-3">
-            <span className="text-xs font-medium text-gray-400">System Role</span>
-            {canChangeRole ? (
-              <div className="flex items-center gap-0">
-                <select
-                  value={resolvedRole}
-                  onChange={(e) => setNewRole(e.target.value as UserRole)}
-                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white text-army-dark focus:outline-none focus:ring-1 focus:ring-army/20"
-                >
-                  <option value="personnel">Personnel</option>
-                  <option value="divisionAdmin">Division Admin</option>
-                  <option value="superAdmin">Super Admin</option>
-                </select>
-                <button
-                  onClick={handleRoleUpdate}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-dark text-white hover:bg-army-dark/90 transition-colors ml-2"
-                >
-                  Update
-                </button>
+          <div className="rounded-lg border border-gray-100 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-1">System Role</p>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-army-dark/5 text-army-dark">
+                  {roleLabel(resolvedRole)}
+                </span>
               </div>
-            ) : (
-              <span className="text-xs font-semibold text-army-dark">{roleLabel(targetUser.role)}</span>
-            )}
+              {canChangeRole ? (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={resolvedRole}
+                    onChange={(e) => setNewRole(e.target.value as UserRole)}
+                    className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white text-army-dark focus:outline-none focus:ring-2 focus:ring-army/15"
+                  >
+                    <option value="personnel">Personnel</option>
+                    <option value="divisionAdmin">Division Admin</option>
+                    <option value="superAdmin">Super Admin</option>
+                  </select>
+                  <button
+                    onClick={handleRoleUpdate}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-dark text-white hover:bg-army-dark/90 transition-colors"
+                  >
+                    Update
+                  </button>
+                </div>
+              ) : (
+                <span className="text-xs text-gray-400">Read-only</span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -473,13 +455,13 @@ function AdminUserDetail() {
             <h3 className="text-sm font-bold text-army-dark">Payslips</h3>
             <span className="text-xs text-gray-400 font-medium">{allPayslips.length}</span>
           </div>
-          <button
-            onClick={() => setShowUpload(true)}
+          <Link
+            to="/admin/payroll/upload"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-gold text-army-dark hover:bg-army-gold-light transition-colors"
           >
             <Upload className="w-3.5 h-3.5" />
             Upload Payslip
-          </button>
+          </Link>
         </div>
 
         {/* Year filter pills */}
@@ -646,198 +628,6 @@ function AdminUserDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Upload Payslip Modal */}
-      <Dialog open={showUpload} onOpenChange={(open) => { if (!open) setShowUpload(false) }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Upload Payslip</DialogTitle>
-            <DialogDescription>
-              Adding payslip for {targetUser.name} ({targetUser.armyNumber})
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2">
-            {/* Month + Year */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Month</label>
-                <select
-                  value={uploadMonth}
-                  onChange={(e) => setUploadMonth(Number(e.target.value))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-army/20"
-                >
-                  {MONTH_NAMES_FULL.slice(1).map((m, i) => (
-                    <option key={m} value={i + 1}>{m}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex-1">
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Year</label>
-                <select
-                  value={uploadYear}
-                  onChange={(e) => setUploadYear(Number(e.target.value))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-army/20"
-                >
-                  {[2023, 2024, 2025, 2026].map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Earnings */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Earnings</p>
-                <button
-                  onClick={() => addComponent('earning')}
-                  className="inline-flex items-center gap-1 text-xs text-army font-semibold hover:text-army-dark transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add
-                </button>
-              </div>
-              <div className="space-y-2">
-                {uploadComponents.map((c, i) =>
-                  c.type === 'earning' ? (
-                    <div key={i} className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        value={c.label}
-                        onChange={(e) => updateComponent(i, 'label', e.target.value)}
-                        placeholder="Label"
-                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-army/20"
-                      />
-                      <input
-                        type="number"
-                        value={c.amount || ''}
-                        onChange={(e) => updateComponent(i, 'amount', Number(e.target.value))}
-                        placeholder="0"
-                        className="w-28 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-army/20"
-                      />
-                      <button
-                        onClick={() => removeComponent(i)}
-                        className="text-gray-300 hover:text-red-400 transition-colors"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : null,
-                )}
-              </div>
-            </div>
-
-            {/* Deductions */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Deductions</p>
-                <button
-                  onClick={() => addComponent('deduction')}
-                  className="inline-flex items-center gap-1 text-xs text-red-500 font-semibold hover:text-red-700 transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add
-                </button>
-              </div>
-              <div className="space-y-2">
-                {uploadComponents.map((c, i) =>
-                  c.type === 'deduction' ? (
-                    <div key={i} className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        value={c.label}
-                        onChange={(e) => updateComponent(i, 'label', e.target.value)}
-                        placeholder="Label"
-                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-army/20"
-                      />
-                      <input
-                        type="number"
-                        value={c.amount || ''}
-                        onChange={(e) => updateComponent(i, 'amount', Number(e.target.value))}
-                        placeholder="0"
-                        className="w-28 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-army/20"
-                      />
-                      <button
-                        onClick={() => removeComponent(i)}
-                        className="text-gray-300 hover:text-red-400 transition-colors"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : null,
-                )}
-              </div>
-            </div>
-
-            {/* Auto-calculated summary */}
-            <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1">
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Gross Pay</span>
-                <span className="font-mono">₦{uploadGross.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-xs text-red-500">
-                <span>Total Deductions</span>
-                <span className="font-mono">-₦{uploadTotalDeductions.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-sm font-bold text-army-dark border-t border-gray-200 pt-1.5 mt-1.5">
-                <span>Net Pay</span>
-                <span className="font-mono text-army-gold">₦{uploadNet.toLocaleString()}</span>
-              </div>
-            </div>
-
-            {/* Status */}
-            <div>
-              <p className="text-xs font-medium text-gray-500 mb-2">Status</p>
-              <div className="flex gap-2">
-                {(['paid', 'short-paid', 'pending'] as PayslipStatus[]).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setUploadStatus(s)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                      uploadStatus === s
-                        ? s === 'paid'
-                          ? 'bg-green-500 text-white'
-                          : s === 'short-paid'
-                            ? 'bg-amber-500 text-white'
-                            : 'bg-gray-400 text-white'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    }`}
-                  >
-                    {s === 'paid' ? 'Paid' : s === 'short-paid' ? 'Short-paid' : 'Pending'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Discrepancy note */}
-            {uploadStatus === 'short-paid' && (
-              <div>
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Discrepancy Note</label>
-                <textarea
-                  value={uploadDiscrepancy}
-                  onChange={(e) => setUploadDiscrepancy(e.target.value)}
-                  placeholder="Describe the short-payment reason..."
-                  rows={2}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-army/20 resize-none"
-                />
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowUpload(false)}
-              className="border-gray-200 text-gray-600 hover:bg-gray-50"
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleUploadSave} disabled={uploadGross <= 0} className="bg-army-dark text-white hover:bg-army transition-colors disabled:opacity-40">
-              Save Payslip
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
