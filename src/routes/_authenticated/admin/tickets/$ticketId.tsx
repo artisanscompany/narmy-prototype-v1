@@ -209,7 +209,8 @@ function AdminTicketDetail() {
           </div>
         </dl>
         <Link
-          to="/admin/users"
+          to="/admin/users/$userId"
+          params={{ userId: ticket.userId }}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-army hover:text-army-gold transition-colors mt-3"
         >
           View full profile →

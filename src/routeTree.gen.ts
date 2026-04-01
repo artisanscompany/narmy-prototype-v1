@@ -16,7 +16,6 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPersonnelRouteImport } from './routes/_authenticated/_personnel'
 import { Route as AuthenticatedELearningIndexRouteImport } from './routes/_authenticated/e-learning/index'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminRbacRouteImport } from './routes/_authenticated/admin/rbac'
 import { Route as AuthenticatedAdminPayrollRouteImport } from './routes/_authenticated/admin/payroll'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
@@ -25,6 +24,7 @@ import { Route as AuthenticatedPersonnelPayRouteImport } from './routes/_authent
 import { Route as AuthenticatedPersonnelHelpRouteImport } from './routes/_authenticated/_personnel/help'
 import { Route as AuthenticatedPersonnelDashboardRouteImport } from './routes/_authenticated/_personnel/dashboard'
 import { Route as AuthenticatedELearningDepartmentIdIndexRouteImport } from './routes/_authenticated/e-learning/$departmentId/index'
+import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedAdminTicketsIndexRouteImport } from './routes/_authenticated/admin/tickets/index'
 import { Route as AuthenticatedPersonnelComplaintsIndexRouteImport } from './routes/_authenticated/_personnel/complaints/index'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users/$userId'
@@ -68,11 +68,6 @@ const AuthenticatedELearningIndexRoute =
     path: '/e-learning/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
 const AuthenticatedAdminRbacRoute = AuthenticatedAdminRbacRouteImport.update({
   id: '/rbac',
   path: '/rbac',
@@ -120,6 +115,12 @@ const AuthenticatedELearningDepartmentIdIndexRoute =
     path: '/e-learning/$departmentId/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminUsersIndexRoute =
+  AuthenticatedAdminUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminTicketsIndexRoute =
   AuthenticatedAdminTicketsIndexRouteImport.update({
     id: '/tickets/',
@@ -134,9 +135,9 @@ const AuthenticatedPersonnelComplaintsIndexRoute =
   } as any)
 const AuthenticatedAdminUsersUserIdRoute =
   AuthenticatedAdminUsersUserIdRouteImport.update({
-    id: '/$userId',
-    path: '/$userId',
-    getParentRoute: () => AuthenticatedAdminUsersRoute,
+    id: '/users/$userId',
+    path: '/users/$userId',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminTicketsTicketIdRoute =
   AuthenticatedAdminTicketsTicketIdRouteImport.update({
@@ -181,7 +182,6 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/payroll': typeof AuthenticatedAdminPayrollRoute
   '/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/e-learning/': typeof AuthenticatedELearningIndexRoute
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
@@ -189,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
+  '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
   '/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
   '/e-learning/$departmentId/$courseId/': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
@@ -205,7 +206,6 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/payroll': typeof AuthenticatedAdminPayrollRoute
   '/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/e-learning': typeof AuthenticatedELearningIndexRoute
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
@@ -213,6 +213,7 @@ export interface FileRoutesByTo {
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/complaints': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/admin/tickets': typeof AuthenticatedAdminTicketsIndexRoute
+  '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/e-learning/$departmentId': typeof AuthenticatedELearningDepartmentIdIndexRoute
   '/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
   '/e-learning/$departmentId/$courseId': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
@@ -232,7 +233,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/payroll': typeof AuthenticatedAdminPayrollRoute
   '/_authenticated/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/_authenticated/e-learning/': typeof AuthenticatedELearningIndexRoute
   '/_authenticated/_personnel/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/_authenticated/_personnel/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
@@ -240,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/_personnel/complaints/': typeof AuthenticatedPersonnelComplaintsIndexRoute
   '/_authenticated/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
+  '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/_authenticated/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
   '/_authenticated/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
   '/_authenticated/e-learning/$departmentId/$courseId/': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
@@ -258,7 +259,6 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/payroll'
     | '/admin/rbac'
-    | '/admin/users'
     | '/e-learning/'
     | '/complaints/$complaintId'
     | '/complaints/new'
@@ -266,6 +266,7 @@ export interface FileRouteTypes {
     | '/admin/users/$userId'
     | '/complaints/'
     | '/admin/tickets/'
+    | '/admin/users/'
     | '/e-learning/$departmentId/'
     | '/e-learning/$departmentId/$courseId/$contentId'
     | '/e-learning/$departmentId/$courseId/'
@@ -282,7 +283,6 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/payroll'
     | '/admin/rbac'
-    | '/admin/users'
     | '/e-learning'
     | '/complaints/$complaintId'
     | '/complaints/new'
@@ -290,6 +290,7 @@ export interface FileRouteTypes {
     | '/admin/users/$userId'
     | '/complaints'
     | '/admin/tickets'
+    | '/admin/users'
     | '/e-learning/$departmentId'
     | '/e-learning/$departmentId/$courseId/$contentId'
     | '/e-learning/$departmentId/$courseId'
@@ -308,7 +309,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/payroll'
     | '/_authenticated/admin/rbac'
-    | '/_authenticated/admin/users'
     | '/_authenticated/e-learning/'
     | '/_authenticated/_personnel/complaints/$complaintId'
     | '/_authenticated/_personnel/complaints/new'
@@ -316,6 +316,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/_personnel/complaints/'
     | '/_authenticated/admin/tickets/'
+    | '/_authenticated/admin/users/'
     | '/_authenticated/e-learning/$departmentId/'
     | '/_authenticated/e-learning/$departmentId/$courseId/$contentId'
     | '/_authenticated/e-learning/$departmentId/$courseId/'
@@ -377,13 +378,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedELearningIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/admin/rbac': {
       id: '/_authenticated/admin/rbac'
       path: '/rbac'
@@ -440,6 +434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedELearningDepartmentIdIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/users/': {
+      id: '/_authenticated/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/tickets/': {
       id: '/_authenticated/admin/tickets/'
       path: '/tickets'
@@ -456,10 +457,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/users/$userId': {
       id: '/_authenticated/admin/users/$userId'
-      path: '/$userId'
+      path: '/users/$userId'
       fullPath: '/admin/users/$userId'
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
-      parentRoute: typeof AuthenticatedAdminUsersRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/tickets/$ticketId': {
       id: '/_authenticated/admin/tickets/$ticketId'
@@ -526,28 +527,15 @@ const AuthenticatedPersonnelRouteWithChildren =
     AuthenticatedPersonnelRouteChildren,
   )
 
-interface AuthenticatedAdminUsersRouteChildren {
-  AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
-}
-
-const AuthenticatedAdminUsersRouteChildren: AuthenticatedAdminUsersRouteChildren =
-  {
-    AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
-  }
-
-const AuthenticatedAdminUsersRouteWithChildren =
-  AuthenticatedAdminUsersRoute._addFileChildren(
-    AuthenticatedAdminUsersRouteChildren,
-  )
-
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminPayrollRoute: typeof AuthenticatedAdminPayrollRoute
   AuthenticatedAdminRbacRoute: typeof AuthenticatedAdminRbacRoute
-  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminTicketsTicketIdRoute: typeof AuthenticatedAdminTicketsTicketIdRoute
+  AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
   AuthenticatedAdminTicketsIndexRoute: typeof AuthenticatedAdminTicketsIndexRoute
+  AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
@@ -555,10 +543,11 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminPayrollRoute: AuthenticatedAdminPayrollRoute,
   AuthenticatedAdminRbacRoute: AuthenticatedAdminRbacRoute,
-  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminTicketsTicketIdRoute:
     AuthenticatedAdminTicketsTicketIdRoute,
+  AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
   AuthenticatedAdminTicketsIndexRoute: AuthenticatedAdminTicketsIndexRoute,
+  AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

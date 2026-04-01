@@ -137,7 +137,7 @@ function AdminPayroll() {
         <div>
           <h1 className="text-xl font-bold text-army-dark">Payroll Management</h1>
           <p className="text-xs text-gray-400 mt-0.5">
-            {filteredPayslips.length} payslip{filteredPayslips.length !== 1 ? 's' : ''} · {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
+            {payslipsThisMonth.length} payslip{payslipsThisMonth.length !== 1 ? 's' : ''} · {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
           </p>
         </div>
         <button
@@ -452,7 +452,7 @@ function AdminPayroll() {
             </Button>
             <Button
               onClick={handleSavePayslip}
-              disabled={!uploadUserId}
+              disabled={!uploadUserId || gross <= 0}
               className="bg-army-gold text-army-dark font-bold hover:bg-army-gold-light"
             >
               Save Payslip

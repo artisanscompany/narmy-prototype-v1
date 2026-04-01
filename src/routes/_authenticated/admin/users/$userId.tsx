@@ -832,7 +832,7 @@ function AdminUserDetail() {
             >
               Cancel
             </Button>
-            <Button onClick={handleUploadSave} className="bg-army-dark text-white hover:bg-army transition-colors">
+            <Button onClick={handleUploadSave} disabled={uploadGross <= 0} className="bg-army-dark text-white hover:bg-army transition-colors disabled:opacity-40">
               Save Payslip
             </Button>
           </DialogFooter>

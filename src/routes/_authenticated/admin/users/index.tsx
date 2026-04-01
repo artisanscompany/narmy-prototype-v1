@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react'
 import { Search, ChevronRight, X } from 'lucide-react'
 import type { UserRole } from '#/types/user'
 
-export const Route = createFileRoute('/_authenticated/admin/users')({
+export const Route = createFileRoute('/_authenticated/admin/users/')({
   component: AdminUsers,
 })
 
