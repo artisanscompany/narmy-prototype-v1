@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { ComplaintForm } from '#/components/complaint-form'
+import { ArrowLeft } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/_personnel/complaints/new')({
   component: NewComplaintPage,
@@ -7,11 +8,11 @@ export const Route = createFileRoute('/_authenticated/_personnel/complaints/new'
 
 function NewComplaintPage() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-army-dark">Raise a Complaint</h1>
-        <p className="text-gray-500 text-sm mt-1">Follow the steps below to submit your complaint</p>
-      </div>
+    <div className="max-w-3xl mx-auto">
+      <Link to="/complaints" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-army transition-colors mb-5">
+        <ArrowLeft className="w-3.5 h-3.5" />
+        All complaints
+      </Link>
       <ComplaintForm />
     </div>
   )

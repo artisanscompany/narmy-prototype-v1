@@ -1,11 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useAuth } from '#/contexts/AuthContext'
 import { useData } from '#/contexts/DataContext'
-import { Card, CardContent } from '#/components/ui/card'
-import { Button } from '#/components/ui/button'
 import { StatusBadge } from '#/components/status-badge'
 import { useState } from 'react'
-import { Plus, ChevronRight } from 'lucide-react'
+import { PenLine, Search, X, ArrowUpRight, Paperclip } from 'lucide-react'
 import type { ComplaintStatus } from '#/types/complaint'
 
 export const Route = createFileRoute('/_authenticated/_personnel/complaints/')({
@@ -14,86 +12,168 @@ export const Route = createFileRoute('/_authenticated/_personnel/complaints/')({
 
 const filterOptions: { label: string; value: ComplaintStatus | 'all' }[] = [
   { label: 'All', value: 'all' },
-  { label: 'Submitted', value: 'submitted' },
-  { label: 'Under Review', value: 'under-review' },
+  { label: 'Open', value: 'submitted' },
+  { label: 'In Review', value: 'under-review' },
+  { label: 'Action Req.', value: 'needs-more-info' },
   { label: 'Escalated', value: 'escalated' },
   { label: 'Resolved', value: 'resolved' },
+  { label: 'Closed', value: 'closed' },
 ]
 
+function getSlaLabel(deadline: string, status: ComplaintStatus): { label: string; urgent: boolean } | null {
+  if (['resolved', 'closed'].includes(status)) return null
+  const now = new Date()
+  const sla = new Date(deadline)
+  const diffMs = sla.getTime() - now.getTime()
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays < 0) return { label: 'Overdue', urgent: true }
+  if (diffDays === 0) return { label: 'Due today', urgent: true }
+  if (diffDays <= 3) return { label: `${diffDays}d left`, urgent: true }
+  return { label: `${diffDays}d left`, urgent: false }
+}
 
 function ComplaintsListPage() {
   const { user } = useAuth()
   const { getComplaintsForUser } = useData()
   const [filter, setFilter] = useState<ComplaintStatus | 'all'>('all')
+  const [search, setSearch] = useState('')
 
   if (!user) return null
 
   const complaints = getComplaintsForUser(user.id)
-  const filtered = filter === 'all' ? complaints : complaints.filter((c) => c.status === filter)
+  const openCount = complaints.filter(c => !['resolved', 'closed'].includes(c.status)).length
+
+  const searched = search.trim()
+    ? complaints.filter((c) =>
+        c.subcategory.toLowerCase().includes(search.toLowerCase()) ||
+        c.category.toLowerCase().includes(search.toLowerCase()) ||
+        c.id.toLowerCase().includes(search.toLowerCase()) ||
+        c.description.toLowerCase().includes(search.toLowerCase())
+      )
+    : complaints
+
+  const filtered = filter === 'all' ? searched : searched.filter((c) => c.status === filter)
+  const sorted = [...filtered].sort((a, b) => new Date(b.filedDate).getTime() - new Date(a.filedDate).getTime())
 
   const counts: Record<string, number> = {
-    all: complaints.length,
-    submitted: complaints.filter((c) => c.status === 'submitted').length,
-    'under-review': complaints.filter((c) => c.status === 'under-review').length,
-    escalated: complaints.filter((c) => c.status === 'escalated').length,
-    resolved: complaints.filter((c) => c.status === 'resolved').length,
+    all: searched.length,
+    submitted: searched.filter((c) => c.status === 'submitted').length,
+    'under-review': searched.filter((c) => c.status === 'under-review').length,
+    'needs-more-info': searched.filter((c) => c.status === 'needs-more-info').length,
+    escalated: searched.filter((c) => c.status === 'escalated').length,
+    resolved: searched.filter((c) => c.status === 'resolved').length,
+    closed: searched.filter((c) => c.status === 'closed').length,
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div className="max-w-3xl mx-auto">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-army-dark">My Complaints</h1>
-          <p className="text-gray-500 text-sm mt-1">Showing {complaints.length} complaints</p>
+          <h1 className="text-2xl font-bold text-army-dark">Complaints</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{openCount} open · {complaints.length} total</p>
         </div>
-        <Button asChild className="bg-army-gold text-army-dark hover:bg-army-gold-light font-semibold">
-          <Link to="/complaints/new">
-            <Plus className="w-4 h-4 mr-2" />
-            Raise Complaint
-          </Link>
-        </Button>
+        <Link
+          to="/complaints/new"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-army-gold text-army-dark text-sm font-bold hover:bg-army-gold-light transition-colors shrink-0"
+        >
+          <PenLine className="w-4 h-4" />
+          Raise Complaint
+        </Link>
       </div>
 
-      <div className="flex gap-2 mb-4 flex-wrap">
-        {filterOptions.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setFilter(opt.value)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filter === opt.value ? 'bg-army-dark text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-          >
-            {opt.label} ({counts[opt.value]})
-          </button>
-        ))}
-      </div>
-
-      <Card>
-        <CardContent className="p-0">
-          {filtered.length === 0 ? (
-            <div className="px-6 py-12 text-center text-gray-400 text-sm">No complaints match this filter. You can raise a new complaint using the button above.</div>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {filtered.map((c) => (
-                <Link
-                  key={c.id}
-                  to="/complaints/$complaintId"
-                  params={{ complaintId: c.id }}
-                  className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
-                >
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-mono text-gray-400">{c.id}</span>
-                      <StatusBadge status={c.status} />
-                    </div>
-                    <div className="text-sm font-semibold text-army-dark">{c.subcategory}</div>
-                    <div className="text-xs text-gray-400 mt-1">{c.category} · Filed {new Date(c.filedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300" />
-                </Link>
-              ))}
-            </div>
+      {/* Search + Filters */}
+      <div className="space-y-3 mb-5">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search by title, category, or ticket ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-200 bg-white text-sm text-army-dark placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-army/15 focus:border-army/30 transition-all"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600">
+              <X className="w-4 h-4" />
+            </button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="flex gap-1.5 flex-wrap">
+          {filterOptions.map((opt) => {
+            const count = counts[opt.value]
+            if (opt.value !== 'all' && count === 0) return null
+            return (
+              <button
+                key={opt.value}
+                onClick={() => setFilter(opt.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  filter === opt.value
+                    ? 'bg-army-dark text-white'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}
+              >
+                {opt.label} {count > 0 ? `(${count})` : ''}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Complaint List */}
+      {sorted.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 px-6 py-12 text-center">
+          <p className="text-sm text-gray-500 mb-1">
+            {search ? `No results for "${search}"` : 'No complaints match this filter'}
+          </p>
+          <p className="text-xs text-gray-500">
+            {search ? 'Try different keywords' : 'Adjust filters or raise a new complaint'}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {sorted.map((c) => {
+            const sla = getSlaLabel(c.slaDeadline, c.status)
+            const isClosed = ['resolved', 'closed'].includes(c.status)
+            return (
+              <Link
+                key={c.id}
+                to="/complaints/$complaintId"
+                params={{ complaintId: c.id }}
+                className={`block bg-white rounded-xl border px-5 py-4 hover:border-army-gold/20 hover:shadow-sm transition-all group ${isClosed ? 'border-gray-100 opacity-60 hover:opacity-80' : 'border-gray-100'}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2.5 mb-1.5">
+                      <StatusBadge status={c.status} />
+                      {sla && (
+                        <span className={`text-[11px] font-semibold ${sla.urgent ? 'text-red-500' : 'text-gray-500'}`}>
+                          {sla.label}
+                        </span>
+                      )}
+                      {c.attachments && c.attachments.length > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                          <Paperclip className="w-3 h-3" />
+                          {c.attachments.length}
+                        </span>
+                      )}
+                      <span className="text-[11px] font-mono text-gray-300 ml-auto">{c.id}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-army-dark group-hover:text-army transition-colors">{c.subcategory}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {c.category} · Filed {new Date(c.filedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                    {/* Description preview */}
+                    <p className="text-xs text-gray-500 mt-1.5 line-clamp-1">{c.description}</p>
+                  </div>
+                  <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-army-gold transition-colors shrink-0 mt-1" />
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

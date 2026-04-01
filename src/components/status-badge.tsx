@@ -1,20 +1,20 @@
-import { Badge } from '#/components/ui/badge'
 import type { ComplaintStatus } from '#/types/complaint'
 
-const statusConfig: Record<ComplaintStatus, { label: string; className: string }> = {
-  submitted: { label: 'Submitted', className: 'bg-gray-100 text-gray-700 border-gray-200' },
-  'under-review': { label: 'Under Review', className: 'bg-amber-50 text-amber-700 border-amber-200' },
-  'needs-more-info': { label: 'Needs More Info', className: 'bg-orange-50 text-orange-700 border-orange-200' },
-  escalated: { label: 'Escalated', className: 'bg-red-50 text-red-700 border-red-200' },
-  resolved: { label: 'Resolved', className: 'bg-green-50 text-green-700 border-green-200' },
-  closed: { label: 'Closed', className: 'bg-gray-50 text-gray-500 border-gray-200' },
+const statusConfig: Record<ComplaintStatus, { label: string; dot: string; bg: string; text: string }> = {
+  submitted: { label: 'Submitted', dot: 'bg-gray-400', bg: 'bg-gray-50', text: 'text-gray-600' },
+  'under-review': { label: 'In Review', dot: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-700' },
+  'needs-more-info': { label: 'Action Req.', dot: 'bg-orange-400', bg: 'bg-orange-50', text: 'text-orange-700' },
+  escalated: { label: 'Escalated', dot: 'bg-red-400', bg: 'bg-red-50', text: 'text-red-700' },
+  resolved: { label: 'Resolved', dot: 'bg-green-400', bg: 'bg-green-50', text: 'text-green-700' },
+  closed: { label: 'Closed', dot: 'bg-gray-300', bg: 'bg-gray-50', text: 'text-gray-500' },
 }
 
-export function StatusBadge({ status }: { status: ComplaintStatus }) {
+export function StatusBadge({ status, fixed }: { status: ComplaintStatus; fixed?: boolean }) {
   const config = statusConfig[status]
   return (
-    <Badge variant="outline" className={`text-[11px] font-semibold ${config.className}`}>
+    <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${config.bg} ${config.text} ${fixed ? 'w-22.5 justify-center' : ''}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
       {config.label}
-    </Badge>
+    </span>
   )
 }

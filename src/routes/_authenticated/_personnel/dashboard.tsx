@@ -80,7 +80,7 @@ function PersonnelDashboard() {
   })
 
   return (
-    <div className="max-w-3xl mx-auto space-y-3">
+    <div className="max-w-3xl mx-auto space-y-4">
       {user.status === 'awol' && <AWOLBanner />}
 
       {/* Hero — greeting + service details */}
@@ -121,7 +121,7 @@ function PersonnelDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Net Pay</span>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Net Pay</span>
                 {latestPayslip && (
                   <span className="text-xs text-gray-300">· {monthNamesShort[latestPayslip.month]} {latestPayslip.year}</span>
                 )}
@@ -172,7 +172,7 @@ function PersonnelDashboard() {
             <div className="flex items-center justify-between px-5 pt-4 pb-2.5">
               <div className="flex items-baseline gap-2">
                 <h3 className="text-sm font-bold text-army-dark">Complaints</h3>
-                <span className="text-xs text-gray-400">{openComplaints.length} open</span>
+                <span className="text-xs text-gray-500">{openComplaints.length} open</span>
               </div>
               <Link to="/complaints" className="inline-flex items-center gap-1 text-xs text-army font-semibold hover:text-army-gold transition-colors">
                 View all <ArrowUpRight className="w-3 h-3" />
@@ -192,7 +192,7 @@ function PersonnelDashboard() {
                     <StatusBadge status={c.status} fixed />
                     <span className="text-sm text-army-dark group-hover:text-army transition-colors truncate flex-1">{c.subcategory}</span>
                     {showSla && (
-                      <span className={`text-[11px] font-semibold shrink-0 ${sla.urgent ? 'text-red-500' : 'text-gray-400'}`}>
+                      <span className={`text-[11px] font-semibold shrink-0 ${sla.urgent ? 'text-red-500' : 'text-gray-500'}`}>
                         {sla.label}
                       </span>
                     )}
@@ -214,7 +214,7 @@ function PersonnelDashboard() {
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-gray-100 px-5 py-8 text-center">
-            <p className="text-sm text-gray-400 mb-2">No complaints filed</p>
+            <p className="text-sm text-gray-500 mb-2">No complaints filed</p>
             <Link to="/complaints/new" className="text-sm text-army font-semibold hover:text-army-gold transition-colors">
               Raise your first complaint
             </Link>
@@ -234,7 +234,7 @@ function PersonnelDashboard() {
             </span>
           </div>
           <div className="px-5 pb-4">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-500">
               {relevantCourses.length} courses available for your trade
               {inProgressCourses.length > 0 && ` · ${inProgressCourses.length} in progress`}
             </p>

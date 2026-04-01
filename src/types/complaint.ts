@@ -21,6 +21,16 @@ export interface Subcategory {
   label: string
 }
 
+export interface Attachment {
+  id: string
+  name: string
+  type: string
+  size: number
+  dataUrl: string
+  source?: 'submission' | 'response'
+  uploadedAt?: string
+}
+
 export interface Complaint {
   id: string
   userId: string
@@ -36,4 +46,5 @@ export interface Complaint {
   lastUpdated: string
   timeline: TimelineEvent[]
   slaDeadline: string
+  attachments?: Attachment[]
 }

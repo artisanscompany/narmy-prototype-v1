@@ -7,22 +7,22 @@ import {
 import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, Users, Shield, LogOut, UserRound, GraduationCap, Banknote } from 'lucide-react'
 
 const personnelItems = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'E-Learning', to: '/e-learning', icon: GraduationCap },
-  { label: 'Pay & Documents', to: '/pay', icon: Wallet },
+  { label: 'Home', to: '/dashboard', icon: LayoutDashboard },
+  { label: 'Payslips', to: '/pay', icon: Wallet },
   { label: 'Complaints', to: '/complaints', icon: MessageCircle },
-  { label: 'Help & Support', to: '/help', icon: HelpCircle },
-  { label: 'Profile', to: '/profile', icon: UserRound },
+  { label: 'Training', to: '/e-learning', icon: GraduationCap },
+  { label: 'Help Centre', to: '/help', icon: HelpCircle },
+  { label: 'My Profile', to: '/profile', icon: UserRound },
 ]
 
 const adminItems = [
   { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
-  { label: 'E-Learning', to: '/e-learning', icon: GraduationCap },
-  { label: 'Ticket Management', to: '/admin/tickets', icon: Ticket },
+  { label: 'Tickets', to: '/admin/tickets', icon: Ticket },
   { label: 'Payroll', to: '/admin/payroll', icon: Banknote },
   { label: 'Analytics', to: '/admin/analytics', icon: BarChart3 },
-  { label: 'User Management', to: '/admin/users', icon: Users },
-  { label: 'RBAC Matrix', to: '/admin/rbac', icon: Shield },
+  { label: 'Users', to: '/admin/users', icon: Users },
+  { label: 'Training', to: '/e-learning', icon: GraduationCap },
+  { label: 'RBAC', to: '/admin/rbac', icon: Shield },
   { label: 'Profile', to: '/profile', icon: UserRound },
 ]
 

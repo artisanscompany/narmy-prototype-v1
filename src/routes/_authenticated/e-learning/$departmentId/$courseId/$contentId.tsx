@@ -50,7 +50,7 @@ function ContentViewPage() {
   if (!department || !course || !content) {
     return (
       <div className="max-w-4xl mx-auto text-center py-12">
-        <p className="text-sm text-gray-400">Content not found</p>
+        <p className="text-sm text-gray-500">Content not found</p>
         <Link to="/e-learning" className="text-sm text-army font-semibold hover:text-army-gold mt-2 inline-block">
           Back to E-Learning
         </Link>
@@ -84,9 +84,9 @@ function ContentViewPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-5 flex-wrap">
+      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-5 flex-wrap">
         <Link to="/e-learning" className="hover:text-army transition-colors">E-Learning</Link>
         <ChevronRight className="w-3 h-3" />
         <Link to="/e-learning/$departmentId" params={{ departmentId }} className="hover:text-army transition-colors">{department.name}</Link>
@@ -114,16 +114,16 @@ function ContentViewPage() {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">{typeLabels[content.type]}</span>
+                <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">{typeLabels[content.type]}</span>
                 <span className="text-[11px] text-gray-200">·</span>
-                <span className="text-[11px] text-gray-400">{formatLabels[content.format]}</span>
+                <span className="text-[11px] text-gray-500">{formatLabels[content.format]}</span>
                 <span className="text-[11px] text-gray-200">·</span>
-                <span className="text-[11px] text-gray-400">{content.fileSize}</span>
+                <span className="text-[11px] text-gray-500">{content.fileSize}</span>
                 <span className="text-[11px] text-gray-200">·</span>
-                <span className="text-[11px] text-gray-400">{content.pageCount} pages</span>
+                <span className="text-[11px] text-gray-500">{content.pageCount} pages</span>
               </div>
               <h1 className="text-lg font-bold text-army-dark mb-1">{content.title}</h1>
-              <p className="text-xs text-gray-400">{content.description}</p>
+              <p className="text-xs text-gray-500">{content.description}</p>
               <div className="flex items-center gap-2 mt-2">
                 <ClearanceBadge level={content.clearanceLevel} />
                 <span className="text-[11px] text-gray-300">Uploaded by {content.uploadedBy} · {content.uploadDate}</span>
@@ -224,7 +224,7 @@ function ContentViewPage() {
               if (trimmed.startsWith('[ ]') || trimmed.startsWith('[')) {
                 return (
                   <div key={i} className="flex items-start gap-2 pl-4 py-0.5">
-                    <span className="text-gray-400 text-xs mt-0.5">☐</span>
+                    <span className="text-gray-500 text-xs mt-0.5">☐</span>
                     <p className="text-sm text-gray-600 leading-relaxed">{trimmed.replace(/^\[[ x]?\]\s*/, '')}</p>
                   </div>
                 )
