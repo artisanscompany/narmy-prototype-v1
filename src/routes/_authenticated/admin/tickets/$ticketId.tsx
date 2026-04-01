@@ -6,6 +6,7 @@ import { TimelineView } from '#/components/timeline-view'
 import { differenceInDays, format } from 'date-fns'
 import { useState, useRef } from 'react'
 import { ArrowLeft, AlertTriangle, Send, Paperclip, X, File, Download, User as UserIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import type { ComplaintStatus, Attachment } from '#/types/complaint'
 
 export const Route = createFileRoute('/_authenticated/admin/tickets/$ticketId')({
@@ -19,6 +20,15 @@ const STATUS_TRANSITIONS: Record<ComplaintStatus, ComplaintStatus[]> = {
   escalated: ['under-review', 'resolved'],
   resolved: ['closed'],
   closed: [],
+}
+
+const STATUS_LABELS: Record<ComplaintStatus, string> = {
+  submitted: 'Submitted',
+  'under-review': 'In Review',
+  'needs-more-info': 'Action Required',
+  escalated: 'Escalated',
+  resolved: 'Resolved',
+  closed: 'Closed',
 }
 
 function AdminTicketDetail() {
@@ -90,6 +100,7 @@ function AdminTicketDetail() {
     addNote(ticket.id, noteText, user.name, attachmentsWithMeta.length > 0 ? attachmentsWithMeta : undefined)
     setNoteText('')
     setNoteAttachments([])
+    toast.success('Response added')
   }
 
   const handleStatusChange = () => {
@@ -98,6 +109,7 @@ function AdminTicketDetail() {
     setSelectedStatus('')
     setNoteText('')
     setNoteAttachments([])
+    toast.success(`Status updated to ${STATUS_LABELS[selectedStatus]}`)
   }
 
   const handleEscalate = () => {
@@ -105,6 +117,7 @@ function AdminTicketDetail() {
     updateComplaintStatus(ticket.id, 'escalated', user.name, noteText || 'Ticket escalated by admin')
     setNoteText('')
     setNoteAttachments([])
+    toast.success('Ticket escalated')
   }
 
   const handleRequestInfo = () => {
@@ -112,6 +125,7 @@ function AdminTicketDetail() {
     updateComplaintStatus(ticket.id, 'needs-more-info', user.name, noteText || 'Please provide additional information regarding: ')
     setNoteText('')
     setNoteAttachments([])
+    toast.success('Information requested from filer')
   }
 
   return (
@@ -364,7 +378,7 @@ function AdminTicketDetail() {
                     <option value="">Change status...</option>
                     {availableStatuses.map((s) => (
                       <option key={s} value={s}>
-                        {s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                        {STATUS_LABELS[s]}
                       </option>
                     ))}
                   </select>

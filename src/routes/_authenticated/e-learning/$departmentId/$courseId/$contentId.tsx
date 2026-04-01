@@ -275,8 +275,8 @@ function ContentViewPage() {
         <ContentLock requiredLevel={content.clearanceLevel}>
           <div className="bg-white rounded-xl border border-gray-100 p-8">
             <div className="space-y-4">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="h-3 bg-gray-100 rounded" style={{ width: `${40 + Math.random() * 55}%` }} />
+              {[95, 72, 88, 60, 82, 45, 90, 68, 75, 55, 85, 62].map((w, i) => (
+                <div key={i} className="h-3 bg-gray-100 rounded" style={{ width: `${w}%` }} />
               ))}
             </div>
           </div>

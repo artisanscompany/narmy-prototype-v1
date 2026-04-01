@@ -197,7 +197,7 @@ function PayDocumentsPage() {
                         ) : (
                           <span className="text-green-600 font-medium">Paid</span>
                         )}
-                        {p.paidDate && ` · ${p.paidDate.slice(8, 10)} ${monthNamesShort[p.month]}`}
+                        {p.paidDate && ` · ${new Date(p.paidDate).getDate()} ${monthNamesShort[p.month]}`}
                       </p>
                     </div>
                   </div>
@@ -308,6 +308,7 @@ function PayDocumentsPage() {
               onChange={(e) => { setPinCode(e.target.value); setPinError(false) }}
               onKeyDown={(e) => { if (e.key === 'Enter') handlePinSubmit() }}
               placeholder="0000"
+              aria-label="Verification PIN"
               className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-lg text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-army/20 focus:border-army transition-all"
               autoFocus
             />

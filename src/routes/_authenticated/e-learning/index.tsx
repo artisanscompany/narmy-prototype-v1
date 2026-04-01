@@ -103,7 +103,7 @@ function ELearningCatalog() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search departments or courses..."
+          aria-label="Search" placeholder="Search departments or courses..."
           className="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-200 bg-white text-sm text-army-dark placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-army/15 focus:border-army/30 transition-all"
         />
         {isSearching && (

@@ -6,6 +6,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function maskSensitive(value: string): string {
-  if (value.length <= 3) return '****'
-  return '****' + value.slice(-3)
+  if (value.length <= 4) return '••••••'
+  return '••••••' + value.slice(-4)
 }

@@ -41,15 +41,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     loadFromStorage('elearning_progress', SEED_PROGRESS),
   )
 
-  const persistComplaints = (updated: Complaint[]) => {
+  const persistComplaints = useCallback((updated: Complaint[]) => {
     setComplaints(updated)
     saveToStorage('complaints', updated)
-  }
+  }, [])
 
-  const persistProgress = (updated: CourseProgress[]) => {
+  const persistProgress = useCallback((updated: CourseProgress[]) => {
     setElearningProgress(updated)
     saveToStorage('elearning_progress', updated)
-  }
+  }, [])
 
   const addComplaint = useCallback(
     (complaint: Complaint) => {
@@ -64,7 +64,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const updated = complaints.map((c) => {
         if (c.id !== complaintId) return c
         const event: TimelineEvent = {
-          id: `evt-${Date.now()}`,
+          id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           timestamp: new Date().toISOString(),
           type: 'status-change',
           description: note,
@@ -83,7 +83,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const updated = complaints.map((c) => {
         if (c.id !== complaintId) return c
         const event: TimelineEvent = {
-          id: `evt-${Date.now()}`,
+          id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           timestamp: new Date().toISOString(),
           type: 'note',
           description: note,
@@ -116,7 +116,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addPayslip = useCallback(
     (payslip: Payslip) => {
-      const updated = [payslip, ...payslips]
+      // Replace existing payslip for same user/month/year, or add new
+      const exists = payslips.some(p => p.userId === payslip.userId && p.month === payslip.month && p.year === payslip.year)
+      const updated = exists
+        ? payslips.map(p => (p.userId === payslip.userId && p.month === payslip.month && p.year === payslip.year) ? payslip : p)
+        : [payslip, ...payslips]
       setPayslips(updated)
       saveToStorage('payslips', updated)
     },

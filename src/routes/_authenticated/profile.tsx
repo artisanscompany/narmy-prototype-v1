@@ -288,6 +288,7 @@ function ProfilePage() {
               type="password"
               maxLength={4}
               value={code}
+              aria-label="Verification PIN"
               onChange={(e) => {
                 setCode(e.target.value)
                 setCodeError(false)

@@ -124,8 +124,12 @@ function HelpPage() {
   const totalResults = filteredSections.reduce((sum, s) => sum + s.faqs.length, 0)
 
   const scrollToSection = (id: string) => {
-    setActiveSection(activeSection === id ? null : id)
+    const newActive = activeSection === id ? null : id
+    setActiveSection(newActive)
     setSearch('')
+    if (newActive) {
+      setTimeout(() => sectionRefs.current[newActive]?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+    }
   }
 
   return (
@@ -141,7 +145,7 @@ function HelpPage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
         <input
           type="text"
-          placeholder="Search for help — e.g. 'short pay', 'AWOL', 'transfer'"
+          aria-label="Search" placeholder="Search for help — e.g. 'short pay', 'AWOL', 'transfer'"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setActiveSection(null) }}
           className="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-200 bg-white text-sm text-army-dark placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-army/15 focus:border-army/30 transition-all"

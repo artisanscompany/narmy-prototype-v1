@@ -80,7 +80,8 @@ function ComplaintDetailPage() {
 
   const handleAddNote = () => {
     if ((!noteText.trim() && noteAttachments.length === 0) || !user) return
-    const message = noteText.trim() || `Uploaded ${noteAttachments.length} file${noteAttachments.length > 1 ? 's' : ''}.`
+    const fileNames = noteAttachments.map(a => a.name).join(', ')
+    const message = noteText.trim() || `Attached: ${fileNames}`
     addNote(complaintId, message, user.name, noteAttachments.length > 0 ? noteAttachments.map(a => ({ ...a, source: 'response' as const, uploadedAt: new Date().toISOString() })) : undefined)
     setNoteText('')
     setNoteAttachments([])
@@ -245,6 +246,7 @@ function ComplaintDetailPage() {
               type="password"
               maxLength={4}
               value={unlockCode}
+              aria-label="Verification PIN"
               onChange={(e) => { setUnlockCode(e.target.value); setUnlockError(false) }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -287,7 +289,7 @@ function ComplaintDetailPage() {
       {/* Timeline + Reply */}
       <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Activity</h3>
-        <TimelineView events={[...complaint.timeline].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())} filerName={complaint.userName} />
+        <TimelineView events={[...complaint.timeline].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())} filerName={complaint.userName} />
 
         {/* Add response */}
         {!isClosed && (

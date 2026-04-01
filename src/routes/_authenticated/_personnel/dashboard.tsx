@@ -23,7 +23,8 @@ function getGreeting(): string {
   return 'Good evening'
 }
 
-function getSlaLabel(deadline: string): { label: string; urgent: boolean } | null {
+function getSlaLabel(deadline: string, status?: string): { label: string; urgent: boolean } | null {
+  if (status && ['resolved', 'closed'].includes(status)) return null
   const now = new Date()
   const sla = new Date(deadline)
   const diffMs = sla.getTime() - now.getTime()
@@ -61,7 +62,7 @@ function PersonnelDashboard() {
 
   const enlistDate = new Date(user.dateOfEnlistment)
   const now = new Date()
-  const totalMonths = (now.getFullYear() - enlistDate.getFullYear()) * 12 + (now.getMonth() - enlistDate.getMonth())
+  const totalMonths = Math.max(0, (now.getFullYear() - enlistDate.getFullYear()) * 12 + (now.getMonth() - enlistDate.getMonth()))
   const serviceYears = Math.floor(totalMonths / 12)
   const serviceMonths = totalMonths % 12
 
@@ -180,8 +181,8 @@ function PersonnelDashboard() {
             </div>
             <div className="px-5 pb-3">
               {recentComplaints.map((c, i) => {
-                const sla = getSlaLabel(c.slaDeadline)
-                const showSla = sla && !['resolved', 'closed'].includes(c.status)
+                const sla = getSlaLabel(c.slaDeadline, c.status)
+                const showSla = !!sla
                 return (
                   <Link
                     key={c.id}

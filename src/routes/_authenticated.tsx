@@ -1,7 +1,8 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router'
 import { SidebarProvider, SidebarInset } from '#/components/ui/sidebar'
 import { AppSidebar } from '#/components/app-sidebar'
 import { useAuth } from '#/contexts/AuthContext'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/_authenticated')({
   component: AuthenticatedLayout,
@@ -9,10 +10,15 @@ export const Route = createFileRoute('/_authenticated')({
 
 function AuthenticatedLayout() {
   const { user, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
 
-  if (!isAuthenticated || !user) {
-    return <meta httpEquiv="refresh" content="0;url=/login" />
-  }
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      navigate({ to: '/login' })
+    }
+  }, [isAuthenticated, user, navigate])
+
+  if (!isAuthenticated || !user) return null
 
   return (
     <SidebarProvider>

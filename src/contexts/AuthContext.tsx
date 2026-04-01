@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { DEMO_USERS } from '#/data/users'
-import { loadFromStorage, saveToStorage, clearStorage } from '#/lib/localStorage'
+import { loadFromStorage, saveToStorage } from '#/lib/localStorage'
 import type { User, UserRole } from '#/types/user'
 
 interface AuthContextValue {
@@ -28,7 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null)
-    clearStorage()
+    // Only clear auth key — preserve data (complaints, payslips, users, e-learning)
+    try { localStorage.removeItem('narmy_auth_user') } catch { /* ignore */ }
   }, [])
 
   const hasRole = useCallback(

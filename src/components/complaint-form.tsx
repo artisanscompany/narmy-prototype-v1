@@ -86,10 +86,11 @@ export function ComplaintForm() {
   }
 
   const handleSubmit = () => {
-    const ticketNum = String(Math.floor(Math.random() * 9000) + 1000)
+    const year = new Date().getFullYear()
+    const uid = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
     const now = new Date().toISOString()
     const complaint: Complaint = {
-      id: `TKT-2026-${ticketNum}`,
+      id: `TKT-${year}-${uid}`,
       userId: user.id,
       userName: user.name,
       userArmyNumber: user.armyNumber,
@@ -249,12 +250,15 @@ export function ComplaintForm() {
               onChange={handleFileSelect}
               className="hidden"
             />
-            <button
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click() }}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
-              className={`w-full border-2 border-dashed rounded-xl px-4 py-4 text-center transition-all group ${
+              className={`w-full border-2 border-dashed rounded-xl px-4 py-4 text-center transition-all group cursor-pointer ${
                 isDragging ? 'border-army bg-army/5' : 'border-gray-200 hover:border-army/30 hover:bg-army/2'
               }`}
             >
@@ -263,7 +267,7 @@ export function ComplaintForm() {
                 {isDragging ? 'Drop files here' : 'Click or drag files to upload'}
               </p>
               <p className="text-xs text-gray-500 mt-0.5">PDF or images, max 5MB each</p>
-            </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between">
