@@ -73,8 +73,7 @@ export function CourseCard({ course, departmentName, canAccess, progress, onTogg
   if (!canAccess) return card
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Link to={'/e-learning/$departmentId/$courseId' as any} params={{ departmentId: course.departmentId, courseId: course.id } as any}>
+    <Link to="/e-learning/$departmentId/$courseId" params={{ departmentId: course.departmentId, courseId: course.id }}>
       {card}
     </Link>
   )
