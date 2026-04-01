@@ -136,7 +136,7 @@ function ProfilePage() {
       {/* Service summary strip — with left accent bar and dividers */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="flex">
-          <div className="w-1 bg-army-gold shrink-0" />
+          <div className="w-1.5 bg-army-gold shrink-0" />
           <div className="flex-1 px-5 py-3.5">
             <div className="flex items-center">
               {serviceItems.map(({ label, value }, i) => (
@@ -205,8 +205,6 @@ function ProfilePage() {
               { icon: Calendar, label: 'Date of Enlistment', value: formatDate(user.dateOfEnlistment) },
               { icon: MapPin, label: 'State of Origin', value: user.stateOfOrigin },
               { icon: Phone, label: 'Phone', value: user.phone },
-              { icon: Building2, label: 'Unit', value: user.unit },
-              { icon: MapPin, label: 'Division', value: user.division },
             ]).map((row) => (
               <div key={row.label} className="flex items-start gap-3 py-2">
                 <row.icon className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
@@ -216,6 +214,13 @@ function ProfilePage() {
                 </div>
               </div>
             ))}
+            <div className="sm:col-span-2 flex items-start gap-3 py-2 border-t border-gray-50 mt-1 pt-3">
+              <Building2 className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">Unit</p>
+                <p className="text-sm text-army-dark font-semibold truncate">{user.unit}</p>
+              </div>
+            </div>
           </div>
         </div>
 
