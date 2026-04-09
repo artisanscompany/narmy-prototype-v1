@@ -7,96 +7,9 @@ export const Route = createFileRoute('/login')({
 })
 
 const DEMO_ACCOUNTS = [
-  {
-    rank: 'Capt.',
-    name: 'Adeyemi',
-    role: 'Personnel',
-    armyNumber: 'NA/23/01234',
-    salary: 'SAL-001-2024',
-    color: 'army',
-    status: 'Active',
-  },
-  {
-    rank: 'Pte.',
-    name: 'Musa',
-    role: 'Personnel',
-    armyNumber: 'NA/15/05678',
-    salary: 'SAL-002-2024',
-    color: 'army',
-    status: 'Active',
-  },
-  {
-    rank: 'Cpl.',
-    name: 'Bello',
-    role: 'Personnel',
-    armyNumber: 'NA/20/09012',
-    salary: 'SAL-003-2024',
-    color: 'army',
-    status: 'AWOL',
-  },
-  {
-    rank: 'Sgt.',
-    name: 'Yusuf',
-    role: 'Personnel',
-    armyNumber: 'NA/18/03456',
-    salary: 'SAL-004-2024',
-    color: 'army',
-    status: 'Active',
-  },
-  {
-    rank: 'LCpl.',
-    name: 'Obi',
-    role: 'Personnel',
-    armyNumber: 'NA/21/07890',
-    salary: 'SAL-005-2024',
-    color: 'army',
-    status: 'Active',
-  },
-  {
-    rank: 'SSgt.',
-    name: 'Danladi',
-    role: 'Personnel',
-    armyNumber: 'NA/14/02345',
-    salary: 'SAL-006-2024',
-    color: 'army',
-    status: 'Suspended',
-  },
-  {
-    rank: 'Lt.',
-    name: 'Kalu',
-    role: 'Personnel',
-    armyNumber: 'NA/22/06789',
-    salary: 'SAL-007-2024',
-    color: 'army',
-    status: 'Active',
-  },
-  {
-    rank: 'Pte.',
-    name: 'Okoro',
-    role: 'Personnel',
-    armyNumber: 'NA/24/08901',
-    salary: 'SAL-008-2024',
-    color: 'army',
-    status: 'Active',
-  },
-  {
-    rank: 'Maj.',
-    name: 'Okonkwo',
-    role: 'Div Admin',
-    armyNumber: 'DA/10/00456',
-    salary: 'SAL-101-2024',
-    color: 'gold',
-    status: 'Active',
-  },
-  {
-    rank: 'Col.',
-    name: 'Nwachukwu',
-    role: 'Super Admin',
-    armyNumber: 'SA/05/00123',
-    salary: 'SAL-201-2024',
-    color: 'dark',
-    status: 'Active',
-  },
+  { rank: 'Capt.', name: 'Adeyemi', role: 'Personnel', armyNumber: 'NA/23/01234', salary: 'SAL-001-2024', color: 'army' },
+  { rank: 'Maj.', name: 'Okonkwo', role: 'Div Admin', armyNumber: 'DA/10/00456', salary: 'SAL-101-2024', color: 'gold' },
+  { rank: 'Col.', name: 'Nwachukwu', role: 'Super Admin', armyNumber: 'SA/05/00123', salary: 'SAL-201-2024', color: 'dark' },
 ] as const
 
 const ROLE_STYLES = {
@@ -170,7 +83,7 @@ function LoginPage() {
             </div>
             <div className="flex flex-col">
               <span className="text-army-gold text-sm font-bold tracking-[0.35em] uppercase">Nigerian Army</span>
-              <span className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-0.5">Personnel Services</span>
+              <span className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-0.5">Pay Self-Service Portal</span>
             </div>
           </div>
         </div>
@@ -182,12 +95,12 @@ function LoginPage() {
               Welcome to
             </div>
             <h1 className="text-white text-[2.75rem] xl:text-[3.25rem] leading-[1.15] mb-3 tracking-tight">
-              <span className="font-light">Personnel</span><br />
+              <span className="font-light">Pay</span><br />
               <span className="font-bold">Self-Service Portal</span>
             </h1>
             <div className="w-12 h-[2px] bg-army-gold/50 my-6" />
             <p className="text-white/40 text-[15px] max-w-md leading-[1.75]">
-              Access your pay records, download service documents, and submit complaints — all from one secure platform built for the Nigerian Army.
+              Access your pay records, download documents, and submit requests, complaints and inquiries.
             </p>
           </div>
 
@@ -195,9 +108,9 @@ function LoginPage() {
           <div className="space-y-4 max-w-sm">
             {[
               { icon: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z', label: 'Pay slips & salary records' },
-              { icon: 'M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5', label: 'NASFA e-learning courses' },
-              { icon: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155', label: 'Complaint filing & SLA tracking' },
-              { icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z', label: 'Profile & service documents' },
+              { icon: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3', label: 'Download documents' },
+              { icon: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155', label: 'Submit requests, complaints and inquiries' },
+              { icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z', label: 'Profile management' },
               { icon: 'M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z', label: 'Help centre & FAQs' },
             ].map((feature) => (
               <div key={feature.label} className="flex items-center gap-3.5">
@@ -216,10 +129,10 @@ function LoginPage() {
         <div className="relative z-10 border-t border-white/[0.06] pt-6 flex items-end justify-between">
           <div>
             <div className="text-white/40 text-[11px] font-semibold uppercase tracking-[0.2em]">
-              Directorate of Army Personnel Services
+              Federal Republic of Nigeria
             </div>
             <div className="text-white/20 text-[10px] uppercase tracking-[0.15em] mt-1.5">
-              Federal Republic of Nigeria
+              Nigeria Army
             </div>
           </div>
           <div className="border border-army-gold/15 rounded px-2.5 py-1">
@@ -244,8 +157,8 @@ function LoginPage() {
               <img src="/nigerian-army-logo.svg" alt="Nigerian Army Crest" className="w-7 h-7 drop-shadow-[0_0_3px_rgba(200,168,75,0.3)]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-army-dark font-bold text-sm tracking-[0.2em] uppercase">NARMY</span>
-              <span className="text-army-dark/30 text-[9px] tracking-[0.15em] uppercase">Personnel Portal</span>
+              <span className="text-army-dark font-bold text-sm tracking-[0.2em] uppercase">Nigeria Army</span>
+              <span className="text-army-dark/30 text-[9px] tracking-[0.15em] uppercase">Pay Self-Service</span>
             </div>
           </div>
 
@@ -255,7 +168,7 @@ function LoginPage() {
               Secure Access
             </h2>
             <p className="text-army-dark/40 text-sm">
-              Sign in with your Army Number and Salary Account
+              Sign in with your Army Number and Password
             </p>
           </div>
 
@@ -323,28 +236,20 @@ function LoginPage() {
                   key={account.armyNumber}
                   type="button"
                   onClick={() => fillDemo(account.armyNumber, account.salary)}
-                  className={`w-full text-left flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white border border-army-sand/60 hover:border-army-sand hover:shadow-md hover:shadow-army-dark/[0.03] transition-all group cursor-pointer`}
+                  className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-army-sand/60 hover:border-army-sand hover:shadow-sm transition-all group cursor-pointer`}
                 >
-                  {/* Avatar initials */}
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${styles.initials}`}>
+                  <div className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${styles.initials}`}>
                     {account.name[0]}
                   </div>
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-[13px] font-semibold text-army-dark group-hover:text-army-dark/90">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-army-dark">
                         {account.rank} {account.name}
                       </span>
                       <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${styles.badge}`}>
                         {account.role}
                       </span>
-                      {account.status === 'Suspended' && (
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border bg-red-50 text-red-600 border-red-200">
-                          Suspended
-                        </span>
-                      )}
                     </div>
-                    <span className="text-[11px] font-mono text-army-dark/30">{account.armyNumber}</span>
                   </div>
                   {/* Arrow */}
                   <svg className="w-4 h-4 text-army-dark/15 group-hover:text-army-dark/40 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -356,7 +261,11 @@ function LoginPage() {
           </div>
 
           {/* Footer */}
-          <div className="mt-12 pt-6 border-t border-army-sand/50 flex items-center justify-between">
+          <div className="mt-12 pt-6 border-t border-army-sand/50 space-y-4">
+          <p className="text-army-dark/30 text-[11px] text-center">
+              Need help? Contact your base pay office &middot; 0800-ARMY-HELP
+            </p>
+          <div className="flex items-center justify-between">
             <p className="text-army-dark/20 text-[10px] uppercase tracking-[0.15em] font-medium">
               Prototype v1.0
             </p>
@@ -366,6 +275,7 @@ function LoginPage() {
               </svg>
               <span className="text-[10px] tracking-wider uppercase">Secured</span>
             </div>
+          </div>
           </div>
         </div>
       </div>

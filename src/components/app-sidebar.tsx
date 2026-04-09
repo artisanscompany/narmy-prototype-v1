@@ -42,9 +42,9 @@ export function AppSidebar() {
             <img src="/nigerian-army-logo.svg" alt="Nigerian Army Crest" className="w-7 h-7 drop-shadow-[0_0_3px_rgba(200,168,75,0.3)]" />
           </div>
           <div>
-            <div className="text-sm font-bold tracking-[0.2em] text-white">NARMY</div>
+            <div className="text-sm font-bold tracking-[0.2em] text-white">Nigeria Army</div>
             <div className="text-[10px] tracking-wider text-white/40 uppercase">
-              {user.role === 'personnel' ? 'Personnel Portal' : 'Admin Console'}
+              {user.role === 'personnel' ? 'Pay Self-Service' : 'Admin Console'}
             </div>
           </div>
         </div>
