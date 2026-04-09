@@ -108,6 +108,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'Army number not found. Please check and try again.' }
       }
 
+      // De-duplicate: if a pending request already exists, return success silently
+      const existing = resetRequests.find((r) => r.armyNumber === armyNumber && r.status === 'pending')
+      if (existing) {
+        return { success: true, error: null }
+      }
+
       const newRequest: PasswordResetRequest = {
         id: `reset_${Date.now()}`,
         userId: found.id,

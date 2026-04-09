@@ -13,6 +13,10 @@ export function SessionTimeoutManager() {
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const warningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const showWarningRef = useRef(showWarning)
+
+  // Keep ref in sync with state
+  useEffect(() => { showWarningRef.current = showWarning }, [showWarning])
 
   const clearAllTimers = useCallback(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
@@ -31,12 +35,10 @@ export function SessionTimeoutManager() {
     setShowWarning(true)
     setCountdown(60)
 
-    // Force logout after warning duration
     warningTimeoutRef.current = setTimeout(() => {
       forceLogout()
     }, WARNING_DURATION)
 
-    // Tick countdown every second
     countdownTimerRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) return 0
@@ -46,33 +48,28 @@ export function SessionTimeoutManager() {
   }, [forceLogout])
 
   const resetIdleTimer = useCallback(() => {
-    // Don't reset if warning is showing — user must click button
-    if (showWarning) return
-
+    if (showWarningRef.current) return
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
     idleTimerRef.current = setTimeout(() => {
       startWarningCountdown()
     }, IDLE_TIMEOUT)
-  }, [showWarning, startWarningCountdown])
+  }, [startWarningCountdown])
 
   const handleStayLoggedIn = useCallback(() => {
     clearAllTimers()
     setShowWarning(false)
     setCountdown(60)
-    // Restart idle timer after dismissing warning
     idleTimerRef.current = setTimeout(() => {
       startWarningCountdown()
     }, IDLE_TIMEOUT)
   }, [clearAllTimers, startWarningCountdown])
 
+  // Register event listeners once — stable deps via refs
   useEffect(() => {
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll']
-
     const handleActivity = () => resetIdleTimer()
 
     events.forEach((event) => document.addEventListener(event, handleActivity, true))
-
-    // Start initial idle timer
     resetIdleTimer()
 
     return () => {

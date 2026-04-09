@@ -28,8 +28,10 @@ function SetupPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!user || !user.isFirstLogin) {
+    if (!user) {
       navigate({ to: '/login' })
+    } else if (!user.isFirstLogin) {
+      navigate({ to: user.role === 'personnel' ? '/dashboard' : '/admin/dashboard' })
     }
   }, [user, navigate])
 
