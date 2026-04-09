@@ -259,7 +259,7 @@ export const SEED_COMPLAINTS: Complaint[] = [
     userDivision: '2 Mechanised Division',
     category: 'Other',
     subcategory: 'General enquiry',
-    description: 'Requesting clarification on eligibility criteria for the Senior Officers Course. Cannot find information on the e-learning portal.',
+    description: 'Requesting clarification on eligibility criteria for the Senior Officers Course. Cannot find information on the training portal.',
     status: 'under-review',
     priority: 'low',
     filedDate: '2026-03-25T16:00:00Z',

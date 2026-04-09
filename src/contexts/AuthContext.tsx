@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null)
-    // Only clear auth key — preserve data (complaints, payslips, users, e-learning)
+    // Only clear auth key — preserve data (complaints, payslips, users)
     try { localStorage.removeItem('narmy_auth_user') } catch { /* ignore */ }
   }, [])
 
