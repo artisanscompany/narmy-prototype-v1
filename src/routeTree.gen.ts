@@ -15,14 +15,12 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPersonnelRouteImport } from './routes/_authenticated/_personnel'
-import { Route as AuthenticatedELearningIndexRouteImport } from './routes/_authenticated/e-learning/index'
 import { Route as AuthenticatedAdminRbacRouteImport } from './routes/_authenticated/admin/rbac'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedPersonnelPayRouteImport } from './routes/_authenticated/_personnel/pay'
 import { Route as AuthenticatedPersonnelHelpRouteImport } from './routes/_authenticated/_personnel/help'
 import { Route as AuthenticatedPersonnelDashboardRouteImport } from './routes/_authenticated/_personnel/dashboard'
-import { Route as AuthenticatedELearningDepartmentIdIndexRouteImport } from './routes/_authenticated/e-learning/$departmentId/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedAdminTicketsIndexRouteImport } from './routes/_authenticated/admin/tickets/index'
 import { Route as AuthenticatedAdminPayrollIndexRouteImport } from './routes/_authenticated/admin/payroll/index'
@@ -32,8 +30,6 @@ import { Route as AuthenticatedAdminTicketsTicketIdRouteImport } from './routes/
 import { Route as AuthenticatedAdminPayrollUploadRouteImport } from './routes/_authenticated/admin/payroll/upload'
 import { Route as AuthenticatedPersonnelComplaintsNewRouteImport } from './routes/_authenticated/_personnel/complaints/new'
 import { Route as AuthenticatedPersonnelComplaintsComplaintIdRouteImport } from './routes/_authenticated/_personnel/complaints/$complaintId'
-import { Route as AuthenticatedELearningDepartmentIdCourseIdIndexRouteImport } from './routes/_authenticated/e-learning/$departmentId/$courseId/index'
-import { Route as AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport } from './routes/_authenticated/e-learning/$departmentId/$courseId/$contentId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -63,12 +59,6 @@ const AuthenticatedPersonnelRoute = AuthenticatedPersonnelRouteImport.update({
   id: '/_personnel',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedELearningIndexRoute =
-  AuthenticatedELearningIndexRouteImport.update({
-    id: '/e-learning/',
-    path: '/e-learning/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminRbacRoute = AuthenticatedAdminRbacRouteImport.update({
   id: '/rbac',
   path: '/rbac',
@@ -103,12 +93,6 @@ const AuthenticatedPersonnelDashboardRoute =
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => AuthenticatedPersonnelRoute,
-  } as any)
-const AuthenticatedELearningDepartmentIdIndexRoute =
-  AuthenticatedELearningDepartmentIdIndexRouteImport.update({
-    id: '/e-learning/$departmentId/',
-    path: '/e-learning/$departmentId/',
-    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminUsersIndexRoute =
   AuthenticatedAdminUsersIndexRouteImport.update({
@@ -164,18 +148,6 @@ const AuthenticatedPersonnelComplaintsComplaintIdRoute =
     path: '/complaints/$complaintId',
     getParentRoute: () => AuthenticatedPersonnelRoute,
   } as any)
-const AuthenticatedELearningDepartmentIdCourseIdIndexRoute =
-  AuthenticatedELearningDepartmentIdCourseIdIndexRouteImport.update({
-    id: '/e-learning/$departmentId/$courseId/',
-    path: '/e-learning/$departmentId/$courseId/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedELearningDepartmentIdCourseIdContentIdRoute =
-  AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport.update({
-    id: '/e-learning/$departmentId/$courseId/$contentId',
-    path: '/e-learning/$departmentId/$courseId/$contentId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -188,7 +160,6 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/e-learning/': typeof AuthenticatedELearningIndexRoute
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/admin/payroll/upload': typeof AuthenticatedAdminPayrollUploadRoute
@@ -198,9 +169,6 @@ export interface FileRoutesByFullPath {
   '/admin/payroll/': typeof AuthenticatedAdminPayrollIndexRoute
   '/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
-  '/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
-  '/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
-  '/e-learning/$departmentId/$courseId/': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -213,7 +181,6 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/e-learning': typeof AuthenticatedELearningIndexRoute
   '/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/admin/payroll/upload': typeof AuthenticatedAdminPayrollUploadRoute
@@ -223,9 +190,6 @@ export interface FileRoutesByTo {
   '/admin/payroll': typeof AuthenticatedAdminPayrollIndexRoute
   '/admin/tickets': typeof AuthenticatedAdminTicketsIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
-  '/e-learning/$departmentId': typeof AuthenticatedELearningDepartmentIdIndexRoute
-  '/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
-  '/e-learning/$departmentId/$courseId': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -241,7 +205,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/rbac': typeof AuthenticatedAdminRbacRoute
-  '/_authenticated/e-learning/': typeof AuthenticatedELearningIndexRoute
   '/_authenticated/_personnel/complaints/$complaintId': typeof AuthenticatedPersonnelComplaintsComplaintIdRoute
   '/_authenticated/_personnel/complaints/new': typeof AuthenticatedPersonnelComplaintsNewRoute
   '/_authenticated/admin/payroll/upload': typeof AuthenticatedAdminPayrollUploadRoute
@@ -251,9 +214,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/payroll/': typeof AuthenticatedAdminPayrollIndexRoute
   '/_authenticated/admin/tickets/': typeof AuthenticatedAdminTicketsIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
-  '/_authenticated/e-learning/$departmentId/': typeof AuthenticatedELearningDepartmentIdIndexRoute
-  '/_authenticated/e-learning/$departmentId/$courseId/$contentId': typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
-  '/_authenticated/e-learning/$departmentId/$courseId/': typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -268,7 +228,6 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/dashboard'
     | '/admin/rbac'
-    | '/e-learning/'
     | '/complaints/$complaintId'
     | '/complaints/new'
     | '/admin/payroll/upload'
@@ -278,9 +237,6 @@ export interface FileRouteTypes {
     | '/admin/payroll/'
     | '/admin/tickets/'
     | '/admin/users/'
-    | '/e-learning/$departmentId/'
-    | '/e-learning/$departmentId/$courseId/$contentId'
-    | '/e-learning/$departmentId/$courseId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -293,7 +249,6 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/dashboard'
     | '/admin/rbac'
-    | '/e-learning'
     | '/complaints/$complaintId'
     | '/complaints/new'
     | '/admin/payroll/upload'
@@ -303,9 +258,6 @@ export interface FileRouteTypes {
     | '/admin/payroll'
     | '/admin/tickets'
     | '/admin/users'
-    | '/e-learning/$departmentId'
-    | '/e-learning/$departmentId/$courseId/$contentId'
-    | '/e-learning/$departmentId/$courseId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -320,7 +272,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/rbac'
-    | '/_authenticated/e-learning/'
     | '/_authenticated/_personnel/complaints/$complaintId'
     | '/_authenticated/_personnel/complaints/new'
     | '/_authenticated/admin/payroll/upload'
@@ -330,9 +281,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/payroll/'
     | '/_authenticated/admin/tickets/'
     | '/_authenticated/admin/users/'
-    | '/_authenticated/e-learning/$departmentId/'
-    | '/_authenticated/e-learning/$departmentId/$courseId/$contentId'
-    | '/_authenticated/e-learning/$departmentId/$courseId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -384,13 +332,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPersonnelRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/e-learning/': {
-      id: '/_authenticated/e-learning/'
-      path: '/e-learning'
-      fullPath: '/e-learning/'
-      preLoaderRoute: typeof AuthenticatedELearningIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin/rbac': {
       id: '/_authenticated/admin/rbac'
       path: '/rbac'
@@ -432,13 +373,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedPersonnelDashboardRouteImport
       parentRoute: typeof AuthenticatedPersonnelRoute
-    }
-    '/_authenticated/e-learning/$departmentId/': {
-      id: '/_authenticated/e-learning/$departmentId/'
-      path: '/e-learning/$departmentId'
-      fullPath: '/e-learning/$departmentId/'
-      preLoaderRoute: typeof AuthenticatedELearningDepartmentIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/users/': {
       id: '/_authenticated/admin/users/'
@@ -503,20 +437,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPersonnelComplaintsComplaintIdRouteImport
       parentRoute: typeof AuthenticatedPersonnelRoute
     }
-    '/_authenticated/e-learning/$departmentId/$courseId/': {
-      id: '/_authenticated/e-learning/$departmentId/$courseId/'
-      path: '/e-learning/$departmentId/$courseId'
-      fullPath: '/e-learning/$departmentId/$courseId/'
-      preLoaderRoute: typeof AuthenticatedELearningDepartmentIdCourseIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/e-learning/$departmentId/$courseId/$contentId': {
-      id: '/_authenticated/e-learning/$departmentId/$courseId/$contentId'
-      path: '/e-learning/$departmentId/$courseId/$contentId'
-      fullPath: '/e-learning/$departmentId/$courseId/$contentId'
-      preLoaderRoute: typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
   }
 }
 
@@ -580,10 +500,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedELearningIndexRoute: typeof AuthenticatedELearningIndexRoute
-  AuthenticatedELearningDepartmentIdIndexRoute: typeof AuthenticatedELearningDepartmentIdIndexRoute
-  AuthenticatedELearningDepartmentIdCourseIdContentIdRoute: typeof AuthenticatedELearningDepartmentIdCourseIdContentIdRoute
-  AuthenticatedELearningDepartmentIdCourseIdIndexRoute: typeof AuthenticatedELearningDepartmentIdCourseIdIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -591,13 +507,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedELearningIndexRoute: AuthenticatedELearningIndexRoute,
-  AuthenticatedELearningDepartmentIdIndexRoute:
-    AuthenticatedELearningDepartmentIdIndexRoute,
-  AuthenticatedELearningDepartmentIdCourseIdContentIdRoute:
-    AuthenticatedELearningDepartmentIdCourseIdContentIdRoute,
-  AuthenticatedELearningDepartmentIdCourseIdIndexRoute:
-    AuthenticatedELearningDepartmentIdCourseIdIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

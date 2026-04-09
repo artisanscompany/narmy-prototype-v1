@@ -1,11 +1,9 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { SEED_COMPLAINTS } from '#/data/complaints'
-import { SEED_PROGRESS } from '#/data/elearning'
 import { PAYSLIPS } from '#/data/payslips'
 import { DEMO_USERS } from '#/data/users'
 import { loadFromStorage, saveToStorage } from '#/lib/localStorage'
 import type { Complaint, ComplaintStatus, TimelineEvent, Attachment } from '#/types/complaint'
-import type { CourseProgress } from '#/types/elearning'
 import type { Payslip } from '#/types/payslip'
 import type { User, UserRole, ServiceStatus } from '#/types/user'
 
@@ -13,7 +11,6 @@ interface DataContextValue {
   complaints: Complaint[]
   payslips: Payslip[]
   users: User[]
-  elearningProgress: CourseProgress[]
   addComplaint: (complaint: Complaint) => void
   updateComplaintStatus: (complaintId: string, newStatus: ComplaintStatus, actor: string, note: string) => void
   addNote: (complaintId: string, note: string, actor: string, attachments?: Attachment[]) => void
@@ -24,9 +21,6 @@ interface DataContextValue {
   getComplaintsForUser: (userId: string) => Complaint[]
   getComplaintsForDivision: (division: string) => Complaint[]
   getPayslipsForUser: (userId: string) => Payslip[]
-  toggleContentCompletion: (userId: string, courseId: string, contentId: string) => void
-  toggleBookmark: (userId: string, courseId: string) => void
-  getProgressForUser: (userId: string) => CourseProgress[]
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
@@ -37,18 +31,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   )
   const [payslips, setPayslips] = useState<Payslip[]>(() => loadFromStorage('payslips', PAYSLIPS))
   const [users, setUsers] = useState<User[]>(() => loadFromStorage('users', DEMO_USERS))
-  const [elearningProgress, setElearningProgress] = useState<CourseProgress[]>(() =>
-    loadFromStorage('elearning_progress', SEED_PROGRESS),
-  )
 
   const persistComplaints = useCallback((updated: Complaint[]) => {
     setComplaints(updated)
     saveToStorage('complaints', updated)
-  }, [])
-
-  const persistProgress = useCallback((updated: CourseProgress[]) => {
-    setElearningProgress(updated)
-    saveToStorage('elearning_progress', updated)
   }, [])
 
   const addComplaint = useCallback(
@@ -160,68 +146,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [payslips],
   )
 
-  const toggleContentCompletion = useCallback(
-    (userId: string, courseId: string, contentId: string) => {
-      const existing = elearningProgress.find((p) => p.userId === userId && p.courseId === courseId)
-      if (existing) {
-        const completed = existing.completedContentIds.includes(contentId)
-          ? existing.completedContentIds.filter((id) => id !== contentId)
-          : [...existing.completedContentIds, contentId]
-        const updated = elearningProgress.map((p) =>
-          p.userId === userId && p.courseId === courseId
-            ? { ...p, completedContentIds: completed, lastAccessedDate: new Date().toISOString().split('T')[0] }
-            : p,
-        )
-        persistProgress(updated)
-      } else {
-        const newProgress: CourseProgress = {
-          userId,
-          courseId,
-          completedContentIds: [contentId],
-          bookmarked: false,
-          lastAccessedDate: new Date().toISOString().split('T')[0],
-        }
-        persistProgress([...elearningProgress, newProgress])
-      }
-    },
-    [elearningProgress],
-  )
-
-  const toggleBookmark = useCallback(
-    (userId: string, courseId: string) => {
-      const existing = elearningProgress.find((p) => p.userId === userId && p.courseId === courseId)
-      if (existing) {
-        const updated = elearningProgress.map((p) =>
-          p.userId === userId && p.courseId === courseId ? { ...p, bookmarked: !p.bookmarked } : p,
-        )
-        persistProgress(updated)
-      } else {
-        const newProgress: CourseProgress = {
-          userId,
-          courseId,
-          completedContentIds: [],
-          bookmarked: true,
-          lastAccessedDate: new Date().toISOString().split('T')[0],
-        }
-        persistProgress([...elearningProgress, newProgress])
-      }
-    },
-    [elearningProgress],
-  )
-
-  const getProgressForUser = useCallback(
-    (userId: string) => elearningProgress.filter((p) => p.userId === userId),
-    [elearningProgress],
-  )
-
   return (
     <DataContext.Provider
       value={{
-        complaints, payslips, users, elearningProgress,
+        complaints, payslips, users,
         addComplaint, updateComplaintStatus,
         addNote, updateUserRole, addPayslip, updatePayslip, updateUserStatus,
         getComplaintsForUser, getComplaintsForDivision, getPayslipsForUser,
-        toggleContentCompletion, toggleBookmark, getProgressForUser,
       }}
     >
       {children}

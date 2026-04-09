@@ -8,9 +8,7 @@ import {
   ArrowUpRight,
   AlertTriangle,
   PenLine,
-  GraduationCap,
 } from 'lucide-react'
-import { DEPARTMENTS, COURSES } from '#/data/elearning'
 
 export const Route = createFileRoute('/_authenticated/_personnel/dashboard')({
   component: PersonnelDashboard,
@@ -37,7 +35,7 @@ function getSlaLabel(deadline: string, status?: string): { label: string; urgent
 
 function PersonnelDashboard() {
   const { user } = useAuth()
-  const { getComplaintsForUser, getPayslipsForUser, getProgressForUser } = useData()
+  const { getComplaintsForUser, getPayslipsForUser } = useData()
 
   if (!user) return null
 
@@ -71,14 +69,6 @@ function PersonnelDashboard() {
     : null
 
   const shortPaidSlip = sortedPayslips.find(s => s.status === 'short-paid')
-
-  const relevantDepts = DEPARTMENTS.filter((d) => d.trades.includes(user.trade))
-  const relevantCourses = COURSES.filter((c) => relevantDepts.some((d) => d.id === c.departmentId))
-  const elearningProgress = getProgressForUser(user.id)
-  const inProgressCourses = elearningProgress.filter((p) => {
-    const course = COURSES.find((c) => c.id === p.courseId)
-    return course && p.completedContentIds.length > 0 && p.completedContentIds.length < course.contents.length
-  })
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
@@ -221,27 +211,6 @@ function PersonnelDashboard() {
             </Link>
           </div>
         )}
-
-      {/* E-Learning */}
-      <Link to="/e-learning" className="group block">
-        <div className="bg-white rounded-xl border border-gray-100 transition-all group-hover:border-army-gold/20 group-hover:shadow-sm">
-          <div className="flex items-center justify-between px-5 pt-4 pb-2.5">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-army" />
-              <h3 className="text-sm font-bold text-army-dark">E-Learning</h3>
-            </div>
-            <span className="flex items-center gap-1 text-xs text-army font-semibold group-hover:text-army-gold transition-colors">
-              Browse <ArrowUpRight className="w-3 h-3" />
-            </span>
-          </div>
-          <div className="px-5 pb-4">
-            <p className="text-xs text-gray-500">
-              {relevantCourses.length} courses available for your trade
-              {inProgressCourses.length > 0 && ` · ${inProgressCourses.length} in progress`}
-            </p>
-          </div>
-        </div>
-      </Link>
 
       {/* Pay History */}
         {sortedPayslips.length > 0 && (
