@@ -82,7 +82,7 @@ function LoginPage() {
               <img src="/nigerian-army-logo.svg" alt="Nigerian Army Crest" className="w-9 h-9 drop-shadow-[0_0_6px_rgba(200,168,75,0.25)]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-army-gold text-sm font-bold tracking-[0.35em] uppercase">Nigerian Army</span>
+              <span className="text-army-gold text-sm font-bold tracking-[0.35em] uppercase">Nigeria Army</span>
               <span className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-0.5">Pay Self-Service Portal</span>
             </div>
           </div>
