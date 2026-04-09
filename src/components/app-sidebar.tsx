@@ -8,10 +8,10 @@ import { LayoutDashboard, Wallet, MessageCircle, HelpCircle, Ticket, BarChart3, 
 
 const personnelItems = [
   { label: 'Home', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Payslips', to: '/pay', icon: Wallet },
-  { label: 'Complaints', to: '/complaints', icon: MessageCircle },
-  { label: 'Help Centre', to: '/help', icon: HelpCircle },
   { label: 'My Profile', to: '/profile', icon: UserRound },
+  { label: 'Pay Slips', to: '/pay', icon: Wallet },
+  { label: 'Inquiries', to: '/complaints', icon: MessageCircle },
+  { label: 'Help Center', to: '/help', icon: HelpCircle },
 ]
 
 const adminItems = [
