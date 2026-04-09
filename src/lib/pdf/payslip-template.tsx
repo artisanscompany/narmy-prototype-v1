@@ -79,12 +79,6 @@ export function PayslipPDF({ payslip, user }: { payslip: Payslip; user: User }) 
           <Text style={styles.totalValue}>₦{payslip.netPay.toLocaleString()}</Text>
         </View>
 
-        {payslip.discrepancyNote && (
-          <View style={{ marginTop: 12, padding: 8, backgroundColor: '#FEF3C7', borderRadius: 4 }}>
-            <Text style={{ fontSize: 9, color: '#92400E', fontFamily: 'Helvetica-Bold' }}>⚠ Discrepancy: {payslip.discrepancyNote}</Text>
-          </View>
-        )}
-
         <Text style={styles.footer}>This is a computer-generated document. Nigerian Army Personnel Self-Service Portal.</Text>
       </Page>
     </Document>

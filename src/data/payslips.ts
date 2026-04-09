@@ -6,8 +6,7 @@ function makePayslip(
   year: number,
   earnings: PayComponent[],
   deductions: PayComponent[],
-  status: 'paid' | 'short-paid' | 'pending' = 'paid',
-  discrepancyNote: string | null = null,
+  status: 'paid' | 'pending' = 'paid',
 ): Payslip {
   const grossPay = earnings.reduce((sum, c) => sum + c.amount, 0)
   const totalDeductions = deductions.reduce((sum, c) => sum + c.amount, 0)
@@ -22,7 +21,6 @@ function makePayslip(
     netPay: grossPay - totalDeductions,
     status,
     paidDate: status === 'pending' ? null : `${year}-${String(month).padStart(2, '0')}-25`,
-    discrepancyNote,
   }
 }
 
@@ -30,18 +28,10 @@ const officerEarnings: PayComponent[] = [
   { label: 'Basic Salary', amount: 280000, type: 'earning' },
   { label: 'Housing Allowance', amount: 56000, type: 'earning' },
   { label: 'Transport Allowance', amount: 28000, type: 'earning' },
-  { label: 'SF Allowance', amount: 42000, type: 'earning' },
 ]
 
 const officerDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 32600, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 28000, type: 'deduction' },
-]
-
-const officerFebShortEarnings: PayComponent[] = [
-  { label: 'Basic Salary', amount: 280000, type: 'earning' },
-  { label: 'Housing Allowance', amount: 56000, type: 'earning' },
-  { label: 'Transport Allowance', amount: 28000, type: 'earning' },
 ]
 
 const soldierEarnings: PayComponent[] = [
@@ -52,7 +42,6 @@ const soldierEarnings: PayComponent[] = [
 
 const soldierDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 15625, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 12000, type: 'deduction' },
   { label: 'Welfare Fund', amount: 3400, type: 'deduction' },
 ]
 
@@ -64,7 +53,6 @@ const belloEarnings: PayComponent[] = [
 
 const belloDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 17550, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 13500, type: 'deduction' },
   { label: 'Welfare Fund', amount: 3800, type: 'deduction' },
 ]
 
@@ -72,19 +60,13 @@ function generateMonths(
   userId: string,
   earnings: PayComponent[],
   deductions: PayComponent[],
-  overrides?: { month: number; year: number; earnings: PayComponent[]; status: 'paid' | 'short-paid'; note: string }[],
 ): Payslip[] {
   const months: Payslip[] = []
   for (let i = 0; i < 12; i++) {
     const date = new Date(2026, 2 - i, 1)
     const m = date.getMonth() + 1
     const y = date.getFullYear()
-    const override = overrides?.find((o) => o.month === m && o.year === y)
-    if (override) {
-      months.push(makePayslip(userId, m, y, override.earnings, deductions, override.status, override.note))
-    } else {
-      months.push(makePayslip(userId, m, y, earnings, deductions))
-    }
+    months.push(makePayslip(userId, m, y, earnings, deductions))
   }
   return months
 }
@@ -97,7 +79,6 @@ const sergeantEarnings: PayComponent[] = [
 ]
 const sergeantDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 21500, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 15000, type: 'deduction' },
   { label: 'Welfare Fund', amount: 3800, type: 'deduction' },
 ]
 
@@ -108,7 +89,6 @@ const lcplEarnings: PayComponent[] = [
 ]
 const lcplDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 14950, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 11500, type: 'deduction' },
   { label: 'Welfare Fund', amount: 3200, type: 'deduction' },
 ]
 
@@ -119,7 +99,6 @@ const ssgtEarnings: PayComponent[] = [
 ]
 const ssgtDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 22100, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 17000, type: 'deduction' },
   { label: 'Welfare Fund', amount: 4200, type: 'deduction' },
 ]
 
@@ -130,7 +109,6 @@ const ltEarnings: PayComponent[] = [
 ]
 const ltDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 32500, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 25000, type: 'deduction' },
 ]
 
 const pvtOkoroEarnings: PayComponent[] = [
@@ -140,36 +118,16 @@ const pvtOkoroEarnings: PayComponent[] = [
 ]
 const pvtOkoroDeductions: PayComponent[] = [
   { label: 'Tax (PAYE)', amount: 13000, type: 'deduction' },
-  { label: 'Pension Contribution', amount: 10000, type: 'deduction' },
   { label: 'Welfare Fund', amount: 2800, type: 'deduction' },
 ]
 
 export const PAYSLIPS: Payslip[] = [
-  ...generateMonths('user-001', officerEarnings, officerDeductions, [
-    {
-      month: 2,
-      year: 2026,
-      earnings: officerFebShortEarnings,
-      status: 'short-paid',
-      note: 'SF Allowance (₦42,000) not included. Discrepancy under review.',
-    },
-  ]),
+  ...generateMonths('user-001', officerEarnings, officerDeductions),
   ...generateMonths('user-002', soldierEarnings, soldierDeductions),
   ...generateMonths('user-003', belloEarnings, belloDeductions),
   ...generateMonths('user-006', sergeantEarnings, sergeantDeductions),
   ...generateMonths('user-007', lcplEarnings, lcplDeductions),
-  ...generateMonths('user-008', ssgtEarnings, ssgtDeductions, [
-    {
-      month: 1,
-      year: 2026,
-      earnings: [
-        { label: 'Basic Salary', amount: 170000, type: 'earning' },
-        { label: 'Housing Allowance', amount: 34000, type: 'earning' },
-      ],
-      status: 'short-paid',
-      note: 'Transport Allowance (₦17,000) not included. Under investigation.',
-    },
-  ]),
+  ...generateMonths('user-008', ssgtEarnings, ssgtDeductions),
   ...generateMonths('user-009', ltEarnings, ltDeductions),
   ...generateMonths('user-010', pvtOkoroEarnings, pvtOkoroDeductions),
 ]

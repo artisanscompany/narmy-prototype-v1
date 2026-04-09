@@ -32,7 +32,6 @@ function AdminPayroll() {
   const now = new Date()
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1)
   const [selectedYear, setSelectedYear] = useState(now.getFullYear())
-  const [shortPaidOnly, setShortPaidOnly] = useState(false)
   const [search, setSearch] = useState('')
 
   if (!user) return null
@@ -53,12 +52,11 @@ function AdminPayroll() {
 
   const userMap = useMemo(() => new Map(users.map((u) => [u.id, u])), [users])
 
-  // Filter payslips to scope, month, short-paid toggle, and search
+  // Filter payslips to scope, month, and search
   const filteredPayslips = useMemo(() => {
     return payslips.filter((slip) => {
       if (!scopedUserIds.has(slip.userId)) return false
       if (slip.month !== selectedMonth || slip.year !== selectedYear) return false
-      if (shortPaidOnly && slip.status !== 'short-paid') return false
       if (search.trim()) {
         const u = userMap.get(slip.userId)
         if (!u) return false
@@ -67,19 +65,17 @@ function AdminPayroll() {
       }
       return true
     })
-  }, [payslips, scopedUserIds, selectedMonth, selectedYear, shortPaidOnly, search, userMap])
+  }, [payslips, scopedUserIds, selectedMonth, selectedYear, search, userMap])
 
   // Stats
   const payslipsThisMonth = useMemo(
     () => payslips.filter((s) => scopedUserIds.has(s.userId) && s.month === selectedMonth && s.year === selectedYear),
     [payslips, scopedUserIds, selectedMonth, selectedYear],
   )
-  const shortPaidCount = payslipsThisMonth.filter((s) => s.status === 'short-paid').length
   const totalDisbursed = payslipsThisMonth.reduce((sum, s) => sum + s.netPay, 0)
 
   const statusConfig: Record<PayslipStatus, { label: string; classes: string }> = {
     paid: { label: 'Paid', classes: 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-50 text-green-700' },
-    'short-paid': { label: 'Short-paid', classes: 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700' },
     pending: { label: 'Pending', classes: 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600' },
   }
 
@@ -104,7 +100,7 @@ function AdminPayroll() {
       </div>
 
       {/* Stat Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
           <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Total Personnel</p>
           <p className="text-lg font-extrabold text-army-dark font-mono">{scopedUsers.length}</p>
@@ -112,10 +108,6 @@ function AdminPayroll() {
         <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
           <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Payslips This Month</p>
           <p className="text-lg font-extrabold text-army-dark font-mono">{payslipsThisMonth.length}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Short-Paid</p>
-          <p className="text-lg font-extrabold text-army-dark font-mono">{shortPaidCount}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
           <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">Total Disbursed</p>
@@ -139,14 +131,6 @@ function AdminPayroll() {
             </button>
           )
         })}
-        <button
-          onClick={() => setShortPaidOnly(!shortPaidOnly)}
-          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-            shortPaidOnly ? 'bg-amber-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-amber-400'
-          }`}
-        >
-          Short-paid only
-        </button>
         <div className="relative ml-auto">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           <input

@@ -1,4 +1,4 @@
-export type PayslipStatus = 'paid' | 'short-paid' | 'pending'
+export type PayslipStatus = 'paid' | 'pending'
 
 export interface PayComponent {
   label: string
@@ -17,5 +17,4 @@ export interface Payslip {
   netPay: number
   status: PayslipStatus
   paidDate: string | null
-  discrepancyNote: string | null
 }

@@ -38,7 +38,6 @@ interface CsvRow {
   earnings: PayComponent[]
   deductions: PayComponent[]
   status: PayslipStatus
-  discrepancyNote: string | null
   grossPay: number
   totalDeductions: number
   netPay: number
@@ -61,7 +60,6 @@ function PayrollUpload() {
   const [earnings, setEarnings] = useState<PayComponent[]>([{ label: 'Basic Salary', amount: 0, type: 'earning' }])
   const [deductions, setDeductions] = useState<PayComponent[]>([{ label: 'Tax (PAYE)', amount: 0, type: 'deduction' }])
   const [uploadStatus, setUploadStatus] = useState<PayslipStatus>('paid')
-  const [discrepancyNote, setDiscrepancyNote] = useState('')
 
   // CSV mode state
   const [csvRows, setCsvRows] = useState<CsvRow[]>([])
@@ -105,7 +103,6 @@ function PayrollUpload() {
         uploadStatus === 'pending'
           ? null
           : `${uploadYear}-${String(uploadMonth).padStart(2, '0')}-25`,
-      discrepancyNote: uploadStatus === 'short-paid' ? discrepancyNote : null,
     }
     addPayslip(payslip)
     toast.success('Payslip saved successfully')
@@ -134,10 +131,7 @@ function PayrollUpload() {
           pension_contribution,
           welfare_fund,
           status,
-          ...discrepancyParts
         ] = cols.map((c) => c.trim())
-
-        const discrepancyNote = discrepancyParts.join(',').trim() || null
 
         const matchedUser = armyNumberMap.get(armyNumber)
         if (!matchedUser) {
@@ -148,7 +142,6 @@ function PayrollUpload() {
             earnings: [],
             deductions: [],
             status: 'paid' as PayslipStatus,
-            discrepancyNote: null,
             grossPay: 0,
             totalDeductions: 0,
             netPay: 0,
@@ -188,7 +181,7 @@ function PayrollUpload() {
         const totalDeductions = deductionComponents.reduce((s, c) => s + c.amount, 0)
         const netPay = grossPay - totalDeductions
 
-        const parsedStatus = (['paid', 'short-paid', 'pending'] as PayslipStatus[]).includes(
+        const parsedStatus = (['paid', 'pending'] as PayslipStatus[]).includes(
           status as PayslipStatus,
         )
           ? (status as PayslipStatus)
@@ -201,7 +194,6 @@ function PayrollUpload() {
           earnings: earningComponents,
           deductions: deductionComponents,
           status: parsedStatus,
-          discrepancyNote: parsedStatus === 'short-paid' ? discrepancyNote : null,
           grossPay,
           totalDeductions,
           netPay,
@@ -243,7 +235,6 @@ function PayrollUpload() {
           row.status === 'pending'
             ? null
             : `${row.year}-${String(row.month).padStart(2, '0')}-25`,
-        discrepancyNote: row.discrepancyNote,
       }
       addPayslip(payslip)
     })
@@ -451,7 +442,7 @@ function PayrollUpload() {
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Status</p>
             <div className="flex gap-2">
-              {(['paid', 'short-paid', 'pending'] as PayslipStatus[]).map((s) => (
+              {(['paid', 'pending'] as PayslipStatus[]).map((s) => (
                 <button
                   key={s}
                   onClick={() => setUploadStatus(s)}
@@ -459,31 +450,15 @@ function PayrollUpload() {
                     uploadStatus === s
                       ? s === 'paid'
                         ? 'bg-green-600 text-white'
-                        : s === 'short-paid'
-                        ? 'bg-amber-500 text-white'
                         : 'bg-gray-600 text-white'
                       : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'
                   }`}
                 >
-                  {s === 'short-paid' ? 'Short-paid' : s.charAt(0).toUpperCase() + s.slice(1)}
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
                 </button>
               ))}
             </div>
           </div>
-
-          {/* Discrepancy note */}
-          {uploadStatus === 'short-paid' && (
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Discrepancy Note</label>
-              <textarea
-                value={discrepancyNote}
-                onChange={(e) => setDiscrepancyNote(e.target.value)}
-                placeholder="Describe the discrepancy…"
-                rows={3}
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-army-gold/40 resize-none"
-              />
-            </div>
-          )}
 
           {/* Save button */}
           <div className="flex justify-end pt-1">
@@ -613,10 +588,9 @@ function PayrollUpload() {
                           {row.valid ? (
                             <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
                               row.status === 'paid' ? 'bg-green-50 text-green-700' :
-                              row.status === 'short-paid' ? 'bg-amber-50 text-amber-700' :
                               'bg-gray-100 text-gray-600'
                             }`}>
-                              {row.status === 'short-paid' ? 'Short-paid' : row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+                              {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
                             </span>
                           ) : '—'}
                         </td>

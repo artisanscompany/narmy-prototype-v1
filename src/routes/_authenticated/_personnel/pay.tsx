@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useAuth } from '#/contexts/AuthContext'
 import { useData } from '#/contexts/DataContext'
 import {
@@ -13,7 +13,7 @@ import { Button } from '#/components/ui/button'
 import { pdf } from '@react-pdf/renderer'
 import { PayslipPDF } from '#/lib/pdf/payslip-template'
 import { TaxCertPDF } from '#/lib/pdf/tax-cert-template'
-import { Download, FileText, AlertTriangle, ChevronDown, Lock, PenLine } from 'lucide-react'
+import { Download, FileText, ChevronDown, Lock } from 'lucide-react'
 import { useState } from 'react'
 import type { Payslip } from '#/types/payslip'
 
@@ -31,7 +31,6 @@ function PayDocumentsPage() {
   const { getPayslipsForUser } = useData()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [yearFilter, setYearFilter] = useState<number | 'all'>('all')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'short-paid'>('all')
   const [showPinModal, setShowPinModal] = useState(false)
   const [pinCode, setPinCode] = useState('')
   const [pinError, setPinError] = useState(false)
@@ -39,20 +38,20 @@ function PayDocumentsPage() {
 
   if (!user) return null
 
-  const allPayslips = getPayslipsForUser(user.id).sort((a, b) => (b.year * 100 + b.month) - (a.year * 100 + a.month))
+  const twelveMonthsAgo = new Date()
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
+  const allPayslips = getPayslipsForUser(user.id)
+    .filter(p => new Date(p.year, p.month - 1) >= twelveMonthsAgo)
+    .sort((a, b) => (b.year * 100 + b.month) - (a.year * 100 + a.month))
+
   const years = [...new Set(allPayslips.map(p => p.year))].sort((a, b) => b - a)
 
   // Filters
   const filtered = allPayslips
     .filter(p => yearFilter === 'all' || p.year === yearFilter)
-    .filter(p => statusFilter === 'all' || p.status === statusFilter)
 
-  // Summary stats
+  // Summary stats — latest month only
   const latestPayslip = allPayslips[0]
-  const ytdPayslips = allPayslips.filter(p => p.year === new Date().getFullYear())
-  const ytdEarnings = ytdPayslips.reduce((sum, p) => sum + p.grossPay, 0)
-  const ytdDeductions = ytdPayslips.reduce((sum, p) => sum + p.totalDeductions, 0)
-  const shortPaidCount = allPayslips.filter(p => p.status === 'short-paid').length
 
   const requestDownload = (downloadFn: () => Promise<void>) => {
     setPendingDownload(() => downloadFn)
@@ -100,29 +99,26 @@ function PayDocumentsPage() {
         <p className="text-sm text-gray-500 mt-0.5">{allPayslips.length} payslips{years.length > 0 ? ` · ${years[0]}–${years[years.length - 1]}` : ''}</p>
       </div>
 
-      {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Latest Net Pay</p>
-          <p className="text-lg font-extrabold text-army-dark font-mono">₦{latestPayslip?.netPay.toLocaleString() ?? '—'}</p>
-          <p className="text-xs text-gray-500">{latestPayslip ? `${monthNamesShort[latestPayslip.month]} ${latestPayslip.year}` : ''}</p>
+      {/* Summary strip — latest month */}
+      {latestPayslip && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Gross Pay</p>
+            <p className="text-lg font-extrabold text-army-dark font-mono">₦{latestPayslip.grossPay.toLocaleString()}</p>
+            <p className="text-xs text-gray-500">{monthNamesShort[latestPayslip.month]} {latestPayslip.year}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Deductions</p>
+            <p className="text-lg font-extrabold text-red-500 font-mono">₦{latestPayslip.totalDeductions.toLocaleString()}</p>
+            <p className="text-xs text-gray-500">{monthNamesShort[latestPayslip.month]} {latestPayslip.year}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Net Pay</p>
+            <p className="text-lg font-extrabold text-army-dark font-mono">₦{latestPayslip.netPay.toLocaleString()}</p>
+            <p className="text-xs text-gray-500">{monthNamesShort[latestPayslip.month]} {latestPayslip.year}</p>
+          </div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">YTD Earnings</p>
-          <p className="text-lg font-extrabold text-army-dark font-mono">₦{ytdEarnings.toLocaleString()}</p>
-          <p className="text-xs text-gray-500">{ytdPayslips.length} months in {new Date().getFullYear()}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">YTD Deductions</p>
-          <p className="text-lg font-extrabold text-red-500 font-mono">₦{ytdDeductions.toLocaleString()}</p>
-          <p className="text-xs text-gray-500">Tax + Pension</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Short-paid</p>
-          <p className={`text-lg font-extrabold font-mono ${shortPaidCount > 0 ? 'text-amber-600' : 'text-army-dark'}`}>{shortPaidCount}</p>
-          <p className="text-xs text-gray-500">{shortPaidCount === 0 ? 'All clear' : `${shortPaidCount} month${shortPaidCount > 1 ? 's' : ''} affected`}</p>
-        </div>
-      </div>
+      )}
 
       {/* Tax Certificate */}
       <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 flex items-center justify-between">
@@ -161,13 +157,6 @@ function PayDocumentsPage() {
             {y}
           </button>
         ))}
-        <div className="w-px bg-gray-200 mx-1" />
-        <button
-          onClick={() => setStatusFilter(statusFilter === 'short-paid' ? 'all' : 'short-paid')}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${statusFilter === 'short-paid' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-        >
-          Short-paid only
-        </button>
       </div>
 
       {/* Payslip List */}
@@ -179,12 +168,11 @@ function PayDocumentsPage() {
         <div className="space-y-2">
           {filtered.map((p) => {
             const isExpanded = expandedId === p.id
-            const isShortPaid = p.status === 'short-paid'
             return (
-              <div key={p.id} className={`bg-white rounded-xl border overflow-hidden transition-all ${isShortPaid ? 'border-amber-200' : 'border-gray-100'}`}>
+              <div key={p.id} className="bg-white rounded-xl border border-gray-100 overflow-hidden transition-all">
                 {/* Row */}
                 <div
-                  className={`flex items-center justify-between px-5 py-3.5 cursor-pointer transition-colors ${isShortPaid ? 'hover:bg-amber-50/50' : 'hover:bg-gray-50'}`}
+                  className="flex items-center justify-between px-5 py-3.5 cursor-pointer transition-colors hover:bg-gray-50"
                   onClick={() => setExpandedId(isExpanded ? null : p.id)}
                 >
                   <div className="flex items-center gap-3">
@@ -192,11 +180,7 @@ function PayDocumentsPage() {
                     <div>
                       <p className="text-sm font-semibold text-army-dark">{monthNames[p.month]} {p.year}</p>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {isShortPaid ? (
-                          <span className="text-amber-600 font-medium">Short-paid</span>
-                        ) : (
-                          <span className="text-green-600 font-medium">Paid</span>
-                        )}
+                        <span className="text-green-600 font-medium">Paid</span>
                         {p.paidDate && ` · ${new Date(p.paidDate).getUTCDate()} ${monthNamesShort[p.month]}`}
                       </p>
                     </div>
@@ -221,17 +205,6 @@ function PayDocumentsPage() {
                   const totalDeductions = deductions.reduce((sum, c) => sum + c.amount, 0)
                   return (
                     <div className="border-t border-gray-100">
-                      {/* Discrepancy warning at top */}
-                      {p.discrepancyNote && (
-                        <div className="flex items-center gap-2.5 bg-amber-50 px-5 py-2.5">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                          <p className="text-xs text-amber-700 flex-1">{p.discrepancyNote}</p>
-                          <Link to="/complaints/new" className="text-xs font-semibold text-amber-900 underline decoration-amber-300 hover:no-underline shrink-0">
-                            Report
-                          </Link>
-                        </div>
-                      )}
-
                       <div className="px-5 py-4">
                         {/* Earnings */}
                         <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Earnings</p>
@@ -268,19 +241,6 @@ function PayDocumentsPage() {
                           <span className="text-sm font-semibold text-white/70">Net Pay</span>
                           <span className="text-xl font-extrabold text-army-gold font-mono">₦{p.netPay.toLocaleString()}</span>
                         </div>
-
-                        {/* Report link for short-paid */}
-                        {isShortPaid && !p.discrepancyNote && (
-                          <div className="mt-3 flex items-center justify-end">
-                            <Link
-                              to="/complaints/new"
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors"
-                            >
-                              <PenLine className="w-3 h-3" />
-                              Report this discrepancy
-                            </Link>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )

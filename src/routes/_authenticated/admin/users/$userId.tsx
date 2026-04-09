@@ -26,7 +26,6 @@ import {
   ChevronDown,
   Upload,
   Settings,
-  AlertTriangle,
 } from 'lucide-react'
 import type { UserRole, ServiceStatus } from '#/types/user'
 
@@ -499,9 +498,7 @@ function AdminUserDetail() {
               const statusDot =
                 p.status === 'paid'
                   ? 'bg-green-500'
-                  : p.status === 'short-paid'
-                    ? 'bg-amber-400'
-                    : 'bg-gray-300'
+                  : 'bg-gray-300'
 
               return (
                 <div key={p.id} className="border-b border-gray-50 last:border-b-0">
@@ -529,12 +526,6 @@ function AdminUserDetail() {
                   {/* Expanded content */}
                   {isExpanded && (
                     <div className="border-t border-gray-100">
-                      {p.discrepancyNote && (
-                        <div className="flex items-center gap-2.5 bg-amber-50 px-5 py-2.5">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                          <p className="text-xs text-amber-700">{p.discrepancyNote}</p>
-                        </div>
-                      )}
                       <div className="px-5 py-3">
                         {/* Earnings */}
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Earnings</p>
