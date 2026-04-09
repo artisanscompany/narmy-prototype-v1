@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useAuth } from '#/contexts/AuthContext'
 
@@ -7,9 +7,9 @@ export const Route = createFileRoute('/login')({
 })
 
 const DEMO_ACCOUNTS = [
-  { rank: 'Capt.', name: 'Adeyemi', role: 'Personnel', armyNumber: 'NA/23/01234', salary: 'SAL-001-2024', color: 'army' },
-  { rank: 'Maj.', name: 'Okonkwo', role: 'Div Admin', armyNumber: 'DA/10/00456', salary: 'SAL-101-2024', color: 'gold' },
-  { rank: 'Col.', name: 'Nwachukwu', role: 'Super Admin', armyNumber: 'SA/05/00123', salary: 'SAL-201-2024', color: 'dark' },
+  { rank: 'Capt.', name: 'Adeyemi', role: 'Personnel', armyNumber: 'NA/23/01234', color: 'army' },
+  { rank: 'Maj.', name: 'Okonkwo', role: 'Div Admin', armyNumber: 'DA/10/00456', color: 'gold' },
+  { rank: 'Col.', name: 'Nwachukwu', role: 'Super Admin', armyNumber: 'SA/05/00123', color: 'dark' },
 ] as const
 
 const ROLE_STYLES = {
@@ -34,28 +34,30 @@ function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [armyNumber, setArmyNumber] = useState('')
-  const [salaryAccount, setSalaryAccount] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
-    const user = login(armyNumber, salaryAccount)
-    if (!user) {
-      setError('Invalid credentials. Please check your Army Number and Salary Account Number.')
+    const result = login(armyNumber, password)
+    if (result.error || !result.user) {
+      setError(result.error || 'Invalid credentials.')
       return
     }
-    if (user.role === 'personnel') {
+    if (result.user.isFirstLogin) {
+      navigate({ to: '/setup' })
+    } else if (result.user.role === 'personnel') {
       navigate({ to: '/dashboard' })
     } else {
       navigate({ to: '/admin/dashboard' })
     }
   }
 
-  const fillDemo = (armyNum: string, salary: string) => {
+  const fillDemo = (armyNum: string) => {
     setArmyNumber(armyNum)
-    setSalaryAccount(salary)
+    setPassword('demo1234')
     setError('')
   }
 
@@ -190,13 +192,13 @@ function LoginPage() {
 
             <div>
               <label className="block text-[11px] font-semibold text-army-dark/50 mb-2 uppercase tracking-[0.15em]">
-                Salary Account Number
+                Password
               </label>
               <input
                 type="password"
-                value={salaryAccount}
-                onChange={(e) => setSalaryAccount(e.target.value)}
-                placeholder="e.g. SAL-001-2024"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
                 autoComplete="current-password"
                 className="w-full border border-army-sand rounded-lg px-4 py-3.5 bg-white/70 font-mono text-sm placeholder:text-army-dark/20 focus:outline-none focus:ring-2 focus:ring-army/15 focus:border-army/30 focus:bg-white transition-all"
               />
@@ -220,6 +222,16 @@ function LoginPage() {
             </button>
           </form>
 
+          {/* Forgot password link */}
+          <div className="mt-4 text-center">
+            <Link
+              to="/reset-password"
+              className="text-sm text-army-dark/40 hover:text-army-dark/60 transition-colors"
+            >
+              Forgot password? Request a new one
+            </Link>
+          </div>
+
           {/* Divider */}
           <div className="flex items-center gap-4 my-10">
             <div className="flex-1 h-px bg-army-sand/80" />
@@ -235,7 +247,7 @@ function LoginPage() {
                 <button
                   key={account.armyNumber}
                   type="button"
-                  onClick={() => fillDemo(account.armyNumber, account.salary)}
+                  onClick={() => fillDemo(account.armyNumber)}
                   className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-army-sand/60 hover:border-army-sand hover:shadow-sm transition-all group cursor-pointer`}
                 >
                   <div className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${styles.initials}`}>

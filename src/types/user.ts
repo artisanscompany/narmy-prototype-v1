@@ -23,4 +23,17 @@ export interface User {
   stateOfOrigin: string
   phone: string
   unit: string
+  password: string
+  pin: string | null
+  isFirstLogin: boolean
+  sessionToken: string | null
+}
+
+export interface PasswordResetRequest {
+  id: string
+  userId: string
+  armyNumber: string
+  userName: string
+  requestedAt: string
+  status: 'pending' | 'completed'
 }

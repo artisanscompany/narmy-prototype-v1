@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router'
 import { SidebarProvider, SidebarInset } from '#/components/ui/sidebar'
 import { AppSidebar } from '#/components/app-sidebar'
+import { SessionTimeoutManager } from '#/components/session-timeout-modal'
 import { useAuth } from '#/contexts/AuthContext'
 import { useEffect } from 'react'
 
@@ -22,6 +23,7 @@ function AuthenticatedLayout() {
 
   return (
     <SidebarProvider>
+      <SessionTimeoutManager />
       <div className="flex h-screen w-full overflow-hidden">
         <AppSidebar />
         <SidebarInset className="flex flex-col flex-1 min-w-0 overflow-hidden">

@@ -20,29 +20,31 @@ describe('AuthContext', () => {
 
   it('logs in with valid credentials', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
-    let user: ReturnType<typeof result.current.login>
+    let loginResult: ReturnType<typeof result.current.login>
     act(() => {
-      user = result.current.login('NA/23/01234', 'SAL-001-2024')
+      loginResult = result.current.login('NA/23/01234', 'demo1234')
     })
-    expect(user).not.toBeNull()
+    expect(loginResult!.user).not.toBeNull()
+    expect(loginResult!.error).toBeNull()
     expect(result.current.isAuthenticated).toBe(true)
     expect(result.current.user?.name).toBe('Captain James Adeyemi')
   })
 
   it('rejects invalid credentials', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
-    let user: ReturnType<typeof result.current.login>
+    let loginResult: ReturnType<typeof result.current.login>
     act(() => {
-      user = result.current.login('INVALID', 'INVALID')
+      loginResult = result.current.login('INVALID', 'INVALID')
     })
-    expect(user).toBeNull()
+    expect(loginResult!.user).toBeNull()
+    expect(loginResult!.error).not.toBeNull()
     expect(result.current.isAuthenticated).toBe(false)
   })
 
   it('checks roles correctly', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
     act(() => {
-      result.current.login('SA/05/00123', 'SAL-201-2024')
+      result.current.login('SA/05/00123', 'demo1234')
     })
     expect(result.current.hasRole('superAdmin')).toBe(true)
     expect(result.current.hasRole('personnel')).toBe(false)
@@ -51,7 +53,7 @@ describe('AuthContext', () => {
 
   it('logs out and clears state', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
-    act(() => { result.current.login('NA/23/01234', 'SAL-001-2024') })
+    act(() => { result.current.login('NA/23/01234', 'demo1234') })
     expect(result.current.isAuthenticated).toBe(true)
     act(() => { result.current.logout() })
     expect(result.current.isAuthenticated).toBe(false)
