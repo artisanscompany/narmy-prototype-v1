@@ -145,7 +145,7 @@ function AdminUsers() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-army-dark">{u.name}</p>
                     <p className="text-xs text-gray-400">
-                      <span className="font-mono">{u.armyNumber}</span> · {u.rank} · {u.corps}
+                      <span className="font-mono">{u.armyNumber}</span> · {u.rank}{u.personnelType === 'soldier' ? ` · ${u.trade}` : ''} · {u.corps}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">

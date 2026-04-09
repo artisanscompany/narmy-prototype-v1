@@ -85,21 +85,26 @@ function PersonnelDashboard() {
           </p>
         </div>
 
-        {/* Service detail chips — even 4-col grid */}
+        {/* Service detail chips — dynamic grid based on personnel type */}
         <div className="relative z-10 border-t border-white/8 px-6 py-3.5">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-0">
-            {[
+          {(() => {
+            const chips = [
               { label: 'Army No.', value: user.armyNumber },
-              { label: 'Rank / Grade', value: `${user.rank} – ${user.gradeLevel}` },
-              { label: 'Trade / Step', value: `${user.trade} – ${user.step}` },
+              { label: 'Rank / Step', value: `${user.rank} — Step ${user.step}` },
+              ...(user.personnelType === 'soldier' ? [{ label: 'Trade', value: user.trade }] : []),
               { label: 'Corps', value: user.corps },
-            ].map(({ label, value }) => (
-              <div key={label} className="min-w-0 pr-4">
-                <p className="text-[10px] text-white/25 uppercase tracking-wider font-medium mb-0.5">{label}</p>
-                <p className="text-[13px] text-white/80 font-semibold truncate">{value}</p>
+            ]
+            return (
+              <div className={`grid grid-cols-2 ${chips.length > 3 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-y-3 gap-x-0`}>
+                {chips.map(({ label, value }) => (
+                  <div key={label} className="min-w-0 pr-4">
+                    <p className="text-[10px] text-white/25 uppercase tracking-wider font-medium mb-0.5">{label}</p>
+                    <p className="text-[13px] text-white/80 font-semibold truncate">{value}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )
+          })()}
         </div>
       </div>
 

@@ -98,7 +98,7 @@ function ProfilePage() {
   const serviceItems = [
     { label: 'Rank', value: user.rank },
     { label: 'Grade / Step', value: `${user.gradeLevel} – A${user.step}` },
-    { label: 'Trade', value: user.trade },
+    ...(user.personnelType === 'soldier' ? [{ label: 'Trade', value: user.trade }] : []),
     { label: 'Corps', value: user.corps },
     { label: 'Service', value: `${serviceYears}y ${serviceMonths}m` },
   ]

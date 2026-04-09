@@ -143,7 +143,7 @@ function AdminUserDetail() {
   const serviceItems = [
     { label: 'Rank', value: targetUser.rank },
     { label: 'Grade / Step', value: `${targetUser.gradeLevel} – A${targetUser.step}` },
-    { label: 'Trade', value: targetUser.trade },
+    ...(targetUser.personnelType === 'soldier' ? [{ label: 'Trade', value: targetUser.trade }] : []),
     { label: 'Corps', value: targetUser.corps },
     { label: 'Service', value: `${serviceYears}y ${serviceMonths}m` },
   ]
