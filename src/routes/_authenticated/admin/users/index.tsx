@@ -2,7 +2,8 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useAuth } from '#/contexts/AuthContext'
 import { useData } from '#/contexts/DataContext'
 import { useState, useMemo } from 'react'
-import { Search, ChevronRight, X } from 'lucide-react'
+import { Search, ChevronRight, X, KeyRound, Check } from 'lucide-react'
+import { toast } from 'sonner'
 import type { UserRole } from '#/types/user'
 
 export const Route = createFileRoute('/_authenticated/admin/users/')({
@@ -17,11 +18,14 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 const ALL_ROLES: UserRole[] = ['personnel', 'divisionAdmin', 'superAdmin']
 
+type Tab = 'users' | 'password-resets'
+
 function AdminUsers() {
-  const { user } = useAuth()
+  const { user, resetRequests, adminResetPassword } = useAuth()
   const { users } = useData()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all')
+  const [activeTab, setActiveTab] = useState<Tab>('users')
 
   if (!user) return null
 
@@ -53,6 +57,14 @@ function AdminUsers() {
     return list
   }, [scopedUsers, roleFilter, search])
 
+  const pendingResets = useMemo(() => resetRequests.filter((r) => r.status === 'pending'), [resetRequests])
+  const completedResets = useMemo(() => resetRequests.filter((r) => r.status === 'completed'), [resetRequests])
+
+  function handleGeneratePassword(userId: string, userName: string) {
+    adminResetPassword(userId, 'reset1234')
+    toast.success(`Password reset for ${userName}. Temporary password: reset1234`)
+  }
+
   const roleCounts = useMemo(() => {
     return ALL_ROLES.reduce<Record<UserRole, number>>(
       (acc, role) => {
@@ -71,6 +83,105 @@ function AdminUsers() {
         <p className="text-sm text-gray-400 mt-0.5">{filtered.length} users</p>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`flex-1 px-4 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+            activeTab === 'users'
+              ? 'bg-white text-army-dark shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          Users
+        </button>
+        <button
+          onClick={() => setActiveTab('password-resets')}
+          className={`flex-1 px-4 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer relative ${
+            activeTab === 'password-resets'
+              ? 'bg-white text-army-dark shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          Password Resets
+          {pendingResets.length > 0 && (
+            <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+              {pendingResets.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === 'password-resets' ? (
+        /* Password Resets Tab */
+        <div className="space-y-2">
+          {pendingResets.length === 0 && completedResets.length === 0 ? (
+            <div className="bg-white rounded-xl border border-gray-100 px-6 py-12 text-center">
+              <KeyRound className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+              <p className="text-sm text-gray-400">No password reset requests.</p>
+              <p className="text-xs text-gray-300 mt-1">Requests from the login screen will appear here.</p>
+            </div>
+          ) : (
+            <>
+              {pendingResets.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">
+                    Pending ({pendingResets.length})
+                  </p>
+                  {pendingResets.map((req) => (
+                    <div
+                      key={req.id}
+                      className="bg-white rounded-xl border border-gray-100 px-5 py-3.5 mb-2 flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-army-dark">{req.userName}</p>
+                        <p className="text-xs text-gray-400">
+                          <span className="font-mono">{req.armyNumber}</span>
+                          <span className="text-gray-300 mx-1.5">·</span>
+                          Requested {new Date(req.requestedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleGeneratePassword(req.userId, req.userName)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-gold text-army-dark hover:bg-army-gold-light transition-colors"
+                      >
+                        Generate Password
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {completedResets.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-1 mt-4">
+                    Completed ({completedResets.length})
+                  </p>
+                  {completedResets.map((req) => (
+                    <div
+                      key={req.id}
+                      className="bg-gray-50 rounded-xl border border-gray-100 px-5 py-3.5 mb-2 flex items-center justify-between opacity-60"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-gray-500">{req.userName}</p>
+                        <p className="text-xs text-gray-400">
+                          <span className="font-mono">{req.armyNumber}</span>
+                          <span className="text-gray-300 mx-1.5">·</span>
+                          Requested {new Date(req.requestedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
+                        <Check className="w-3.5 h-3.5" />
+                        Done
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ) : (
+      <>
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
@@ -172,6 +283,8 @@ function AdminUsers() {
           })
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }

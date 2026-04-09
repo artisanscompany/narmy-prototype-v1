@@ -136,7 +136,7 @@ export const DEMO_USERS: User[] = [
     name: 'Sergeant Abubakar Yusuf',
     armyNumber: 'NA/18/03456',
     salaryAccountNo: 'SAL-004-2024',
-    role: 'personnel',
+    role: 'divisionAdmin',
     personnelType: 'soldier',
     rank: 'Sergeant',
     gradeLevel: 'GL 06',

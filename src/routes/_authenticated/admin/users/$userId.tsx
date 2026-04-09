@@ -83,6 +83,9 @@ function AdminUserDetail() {
   const resolvedStatus = newStatus ?? targetUser?.status ?? 'active'
   const resolvedRole = newRole ?? targetUser?.role ?? 'personnel'
 
+  const superAdminCount = useMemo(() => users.filter((u) => u.role === 'superAdmin').length, [users])
+  const superAdminLimitReached = superAdminCount >= 2
+
   const allPayslips = useMemo(
     () => targetUser ? getPayslipsForUser(targetUser.id).sort((a, b) => (b.year * 100 + b.month) - (a.year * 100 + a.month)) : [],
     [targetUser, getPayslipsForUser],
@@ -219,6 +222,10 @@ function AdminUserDetail() {
 
   function handleRoleUpdate() {
     if (!targetUser) return
+    if (resolvedRole === 'superAdmin' && superAdminLimitReached && targetUser.role !== 'superAdmin') {
+      toast.error('Maximum of 2 Super Admins allowed.')
+      return
+    }
     updateUserRole(targetUser.id, resolvedRole)
     toast.success(`Role updated to ${roleLabel(resolvedRole)}`)
   }
@@ -430,8 +437,13 @@ function AdminUserDetail() {
                   >
                     <option value="personnel">Personnel</option>
                     <option value="divisionAdmin">Division Admin</option>
-                    <option value="superAdmin">Super Admin</option>
+                    <option value="superAdmin" disabled={superAdminLimitReached && targetUser.role !== 'superAdmin'}>
+                      Super Admin{superAdminLimitReached && targetUser.role !== 'superAdmin' ? ' (Max 2)' : ''}
+                    </option>
                   </select>
+                  {resolvedRole === 'superAdmin' && superAdminLimitReached && targetUser.role !== 'superAdmin' && (
+                    <p className="text-[11px] text-red-500 mt-1">Maximum of 2 Super Admins allowed.</p>
+                  )}
                   <button
                     onClick={handleRoleUpdate}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-army-dark text-white hover:bg-army-dark/90 transition-colors"
