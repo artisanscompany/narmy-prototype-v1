@@ -5,7 +5,7 @@ import { StatusBadge } from '#/components/status-badge'
 import { TimelineView } from '#/components/timeline-view'
 import { differenceInDays, format } from 'date-fns'
 import { useState, useRef } from 'react'
-import { ArrowLeft, AlertTriangle, Send, Paperclip, X, File, Download, User as UserIcon } from 'lucide-react'
+import { ArrowLeft, AlertTriangle, Send, Paperclip, X, File, Download, User as UserIcon, Play, Pause } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ComplaintStatus, Attachment } from '#/types/complaint'
 
@@ -14,21 +14,25 @@ export const Route = createFileRoute('/_authenticated/admin/tickets/$ticketId')(
 })
 
 const STATUS_TRANSITIONS: Record<ComplaintStatus, ComplaintStatus[]> = {
-  submitted: ['under-review', 'needs-more-info', 'escalated'],
-  'under-review': ['needs-more-info', 'escalated', 'resolved'],
-  'needs-more-info': ['under-review', 'escalated'],
-  escalated: ['under-review', 'resolved'],
+  open: ['review', 'action-required', 'resolved'],
+  review: ['action-required', 'resolved'],
+  'action-required': ['review', 'resolved'],
   resolved: ['closed'],
   closed: [],
 }
 
 const STATUS_LABELS: Record<ComplaintStatus, string> = {
-  submitted: 'Submitted',
-  'under-review': 'In Review',
-  'needs-more-info': 'Action Required',
-  escalated: 'Escalated',
+  open: 'Open',
+  review: 'In Review',
+  'action-required': 'Action Required',
   resolved: 'Resolved',
   closed: 'Closed',
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 function AdminTicketDetail() {
@@ -39,6 +43,8 @@ function AdminTicketDetail() {
   const [selectedStatus, setSelectedStatus] = useState<ComplaintStatus | ''>('')
   const [noteAttachments, setNoteAttachments] = useState<Attachment[]>([])
   const noteFileRef = useRef<HTMLInputElement>(null)
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false)
+  const voiceAudioRef = useRef<HTMLAudioElement | null>(null)
 
   const ticket = complaints.find((c) => c.id === ticketId)
 
@@ -72,8 +78,7 @@ function AdminTicketDetail() {
   const slaBreach = daysLeft < 0
   const availableStatuses = STATUS_TRANSITIONS[ticket.status] ?? []
   const isClosed = ticket.status === 'closed'
-  const canEscalate = ticket.status !== 'escalated' && ticket.status !== 'resolved' && ticket.status !== 'closed'
-  const canRequestInfo = availableStatuses.includes('needs-more-info')
+  const canRequestInfo = availableStatuses.includes('action-required')
 
   const sortedTimeline = [...ticket.timeline].sort(
     (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
@@ -83,7 +88,7 @@ function AdminTicketDetail() {
     const files = e.target.files
     if (!files) return
     Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) return
+      if (file.size > 20 * 1024 * 1024) return
       const reader = new FileReader()
       reader.onload = () => {
         setNoteAttachments((prev) => [
@@ -127,20 +132,26 @@ function AdminTicketDetail() {
     toast.success(`Status updated to ${STATUS_LABELS[selectedStatus]}`)
   }
 
-  const handleEscalate = () => {
-    if (!user) return
-    updateComplaintStatus(ticket.id, 'escalated', user.name, noteText || 'Ticket escalated by admin')
-    setNoteText('')
-    setNoteAttachments([])
-    toast.success('Ticket escalated')
-  }
-
   const handleRequestInfo = () => {
     if (!user) return
-    updateComplaintStatus(ticket.id, 'needs-more-info', user.name, noteText || 'Please provide additional information regarding: ')
+    updateComplaintStatus(ticket.id, 'action-required', user.name, noteText || 'Please provide additional information regarding: ')
     setNoteText('')
     setNoteAttachments([])
     toast.success('Information requested from filer')
+  }
+
+  const toggleVoicePlayback = () => {
+    if (!ticket.voiceRecording) return
+    if (isPlayingVoice && voiceAudioRef.current) {
+      voiceAudioRef.current.pause()
+      setIsPlayingVoice(false)
+      return
+    }
+    const audio = new Audio(ticket.voiceRecording.dataUrl)
+    voiceAudioRef.current = audio
+    audio.onended = () => setIsPlayingVoice(false)
+    audio.play()
+    setIsPlayingVoice(true)
   }
 
   return (
@@ -173,7 +184,7 @@ function AdminTicketDetail() {
             {ticket.priority}
           </span>
         </div>
-        <h1 className="text-xl font-bold text-army-dark mb-1">{ticket.subcategory}</h1>
+        <h1 className="text-xl font-bold text-army-dark mb-1">{ticket.subcategory || ticket.category}</h1>
         <p className="text-sm text-gray-400">{ticket.category}</p>
       </div>
 
@@ -251,6 +262,25 @@ function AdminTicketDetail() {
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Description</h3>
         <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
       </div>
+
+      {/* Voice Recording Playback */}
+      {ticket.voiceRecording && (
+        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Voice Recording</h3>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleVoicePlayback}
+              className="w-8 h-8 rounded-full bg-army flex items-center justify-center shrink-0 hover:bg-army-dark transition-colors"
+            >
+              {isPlayingVoice ? <Pause className="w-3.5 h-3.5 text-white" /> : <Play className="w-3.5 h-3.5 text-white ml-0.5" />}
+            </button>
+            <div>
+              <p className="text-sm font-medium text-army-dark">Voice recording</p>
+              <p className="text-xs text-gray-500">{formatDuration(ticket.voiceRecording.duration)}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Attachments card */}
       {ticket.attachments && ticket.attachments.length > 0 && (
@@ -372,7 +402,7 @@ function AdminTicketDetail() {
               </button>
             </div>
 
-            {/* Right: request info, status change, escalate */}
+            {/* Right: request info, status change */}
             <div className="flex items-center gap-2">
               {canRequestInfo && (
                 <button
@@ -405,15 +435,6 @@ function AdminTicketDetail() {
                     Update
                   </button>
                 </>
-              )}
-
-              {canEscalate && (
-                <button
-                  onClick={handleEscalate}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
-                >
-                  Escalate
-                </button>
               )}
             </div>
           </div>

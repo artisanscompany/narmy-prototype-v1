@@ -1,4 +1,4 @@
-export type ComplaintStatus = 'submitted' | 'under-review' | 'needs-more-info' | 'escalated' | 'resolved' | 'closed'
+export type ComplaintStatus = 'open' | 'review' | 'action-required' | 'resolved' | 'closed'
 export type ComplaintPriority = 'low' | 'medium' | 'high' | 'critical'
 
 export interface TimelineEvent {
@@ -19,6 +19,13 @@ export interface Category {
 export interface Subcategory {
   id: string
   label: string
+}
+
+export interface VoiceRecording {
+  id: string
+  dataUrl: string
+  duration: number
+  recordedAt: string
 }
 
 export interface Attachment {
@@ -47,4 +54,5 @@ export interface Complaint {
   timeline: TimelineEvent[]
   slaDeadline: string
   attachments?: Attachment[]
+  voiceRecording?: VoiceRecording
 }

@@ -33,7 +33,7 @@ export function NotificationBell() {
   if (user.role === 'personnel') {
     const userComplaints = complaints.filter((c) => c.userId === user.id)
     const awaitingFeedback = userComplaints.filter((c) => c.status === 'resolved').length
-    const needsResponse = userComplaints.filter((c) => c.status === 'needs-more-info').length
+    const needsResponse = userComplaints.filter((c) => c.status === 'action-required').length
 
     if (awaitingFeedback > 0) items.push({ label: 'Awaiting your feedback', count: awaitingFeedback })
     if (needsResponse > 0) items.push({ label: 'Needs your response', count: needsResponse })

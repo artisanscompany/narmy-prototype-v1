@@ -31,7 +31,7 @@ describe('DataContext', () => {
       category: 'Pay & Allowances',
       subcategory: 'Delayed Payment',
       description: 'Test complaint',
-      status: 'submitted',
+      status: 'open',
       priority: 'low',
       filedDate: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),

@@ -12,25 +12,12 @@ export const Route = createFileRoute('/_authenticated/_personnel/complaints/')({
 
 const filterOptions: { label: string; value: ComplaintStatus | 'all' }[] = [
   { label: 'All', value: 'all' },
-  { label: 'Open', value: 'submitted' },
-  { label: 'In Review', value: 'under-review' },
-  { label: 'Action Req.', value: 'needs-more-info' },
-  { label: 'Escalated', value: 'escalated' },
+  { label: 'Open', value: 'open' },
+  { label: 'In Review', value: 'review' },
+  { label: 'Action Req.', value: 'action-required' },
   { label: 'Resolved', value: 'resolved' },
   { label: 'Closed', value: 'closed' },
 ]
-
-function getSlaLabel(deadline: string, status: ComplaintStatus): { label: string; urgent: boolean } | null {
-  if (['resolved', 'closed'].includes(status)) return null
-  const now = new Date()
-  const sla = new Date(deadline)
-  const diffMs = sla.getTime() - now.getTime()
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-  if (diffDays < 0) return { label: 'Overdue', urgent: true }
-  if (diffDays === 0) return { label: 'Due today', urgent: true }
-  if (diffDays <= 3) return { label: `${diffDays}d left`, urgent: true }
-  return { label: `${diffDays}d left`, urgent: false }
-}
 
 function ComplaintsListPage() {
   const { user } = useAuth()
@@ -57,10 +44,9 @@ function ComplaintsListPage() {
 
   const counts: Record<string, number> = {
     all: searched.length,
-    submitted: searched.filter((c) => c.status === 'submitted').length,
-    'under-review': searched.filter((c) => c.status === 'under-review').length,
-    'needs-more-info': searched.filter((c) => c.status === 'needs-more-info').length,
-    escalated: searched.filter((c) => c.status === 'escalated').length,
+    open: searched.filter((c) => c.status === 'open').length,
+    review: searched.filter((c) => c.status === 'review').length,
+    'action-required': searched.filter((c) => c.status === 'action-required').length,
     resolved: searched.filter((c) => c.status === 'resolved').length,
     closed: searched.filter((c) => c.status === 'closed').length,
   }
@@ -70,7 +56,7 @@ function ComplaintsListPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-army-dark">Complaints</h1>
+          <h1 className="text-2xl font-bold text-army-dark">Inquiries</h1>
           <p className="text-sm text-gray-500 mt-0.5">{openCount} open · {complaints.length} total</p>
         </div>
         <Link
@@ -78,7 +64,7 @@ function ComplaintsListPage() {
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-army-gold text-army-dark text-sm font-bold hover:bg-army-gold-light transition-colors shrink-0"
         >
           <PenLine className="w-4 h-4" />
-          Raise Complaint
+          Raise Inquiry
         </Link>
       </div>
 
@@ -121,20 +107,19 @@ function ComplaintsListPage() {
         </div>
       </div>
 
-      {/* Complaint List */}
+      {/* Inquiry List */}
       {sorted.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 px-6 py-12 text-center">
           <p className="text-sm text-gray-500 mb-1">
-            {search ? `No results for "${search}"` : 'No complaints match this filter'}
+            {search ? `No results for "${search}"` : 'No inquiries match this filter'}
           </p>
           <p className="text-xs text-gray-500">
-            {search ? 'Try different keywords' : 'Adjust filters or raise a new complaint'}
+            {search ? 'Try different keywords' : 'Adjust filters or raise a new inquiry'}
           </p>
         </div>
       ) : (
         <div className="space-y-2">
           {sorted.map((c) => {
-            const sla = getSlaLabel(c.slaDeadline, c.status)
             const isClosed = ['resolved', 'closed'].includes(c.status)
             return (
               <Link
@@ -147,11 +132,6 @@ function ComplaintsListPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2.5 mb-1.5">
                       <StatusBadge status={c.status} />
-                      {sla && (
-                        <span className={`text-[11px] font-semibold ${sla.urgent ? 'text-red-500' : 'text-gray-500'}`}>
-                          {sla.label}
-                        </span>
-                      )}
                       {c.attachments && c.attachments.length > 0 && (
                         <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
                           <Paperclip className="w-3 h-3" />
@@ -160,7 +140,7 @@ function ComplaintsListPage() {
                       )}
                       <span className="text-[11px] font-mono text-gray-300 ml-auto">{c.id}</span>
                     </div>
-                    <p className="text-sm font-semibold text-army-dark group-hover:text-army transition-colors">{c.subcategory}</p>
+                    <p className="text-sm font-semibold text-army-dark group-hover:text-army transition-colors">{c.subcategory || c.category}</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       {c.category} · Filed {new Date(c.filedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>

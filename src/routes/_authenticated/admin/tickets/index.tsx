@@ -12,19 +12,17 @@ export const Route = createFileRoute('/_authenticated/admin/tickets/')({
 })
 
 const STATUS_OPTIONS: ComplaintStatus[] = [
-  'submitted',
-  'under-review',
-  'needs-more-info',
-  'escalated',
+  'open',
+  'review',
+  'action-required',
   'resolved',
   'closed',
 ]
 
 const STATUS_LABELS: Record<ComplaintStatus, string> = {
-  submitted: 'Submitted',
-  'under-review': 'In Review',
-  'needs-more-info': 'Action Req.',
-  escalated: 'Escalated',
+  open: 'Open',
+  review: 'In Review',
+  'action-required': 'Action Req.',
   resolved: 'Resolved',
   closed: 'Closed',
 }

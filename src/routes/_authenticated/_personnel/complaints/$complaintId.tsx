@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from '#/components/ui/dialog'
 import { Button } from '#/components/ui/button'
-import { ArrowLeft, AlertTriangle, File, Download, Paperclip, Send, X, Lock, Eye } from 'lucide-react'
+import { ArrowLeft, AlertTriangle, File, Download, Paperclip, Send, X, Lock, Eye, Play, Pause } from 'lucide-react'
 import { differenceInDays, format } from 'date-fns'
 import { useState, useRef } from 'react'
 import type { Attachment } from '#/types/complaint'
@@ -28,6 +28,12 @@ const priorityConfig: Record<string, { label: string }> = {
   low: { label: 'Low' },
 }
 
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
 function ComplaintDetailPage() {
   const { complaintId } = Route.useParams()
   const { user } = useAuth()
@@ -40,23 +46,23 @@ function ComplaintDetailPage() {
   const [showUnlockModal, setShowUnlockModal] = useState(false)
   const [unlockCode, setUnlockCode] = useState('')
   const [unlockError, setUnlockError] = useState(false)
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false)
+  const voiceAudioRef = useRef<HTMLAudioElement | null>(null)
 
   const DEMO_PIN = '0000'
 
   if (!complaint) {
     return (
       <div className="max-w-3xl mx-auto py-16 text-center">
-        <p className="text-sm text-gray-500 mb-3">Complaint not found</p>
+        <p className="text-sm text-gray-500 mb-3">Inquiry not found</p>
         <Link to="/complaints" className="text-sm text-army font-semibold hover:text-army-gold transition-colors">
-          Back to complaints
+          Back to inquiries
         </Link>
       </div>
     )
   }
 
   const daysOpen = differenceInDays(new Date(), new Date(complaint.filedDate))
-  const slaRemaining = differenceInDays(new Date(complaint.slaDeadline), new Date())
-  const slaBreached = slaRemaining < 0
   const isClosed = ['resolved', 'closed'].includes(complaint.status)
   const priority = priorityConfig[complaint.priority] ?? priorityConfig.medium
 
@@ -64,7 +70,7 @@ function ComplaintDetailPage() {
     const files = e.target.files
     if (!files) return
     Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) return
+      if (file.size > 20 * 1024 * 1024) return
       if (!file.type.startsWith('image/') && file.type !== 'application/pdf') return
       const reader = new FileReader()
       reader.onload = () => {
@@ -87,12 +93,26 @@ function ComplaintDetailPage() {
     setNoteAttachments([])
   }
 
+  const toggleVoicePlayback = () => {
+    if (!complaint.voiceRecording) return
+    if (isPlayingVoice && voiceAudioRef.current) {
+      voiceAudioRef.current.pause()
+      setIsPlayingVoice(false)
+      return
+    }
+    const audio = new Audio(complaint.voiceRecording.dataUrl)
+    voiceAudioRef.current = audio
+    audio.onended = () => setIsPlayingVoice(false)
+    audio.play()
+    setIsPlayingVoice(true)
+  }
+
   return (
     <div className="max-w-3xl mx-auto">
       {/* Back */}
       <Link to="/complaints" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-army transition-colors mb-5">
         <ArrowLeft className="w-3.5 h-3.5" />
-        All complaints
+        All inquiries
       </Link>
 
       {/* Header */}
@@ -101,17 +121,16 @@ function ComplaintDetailPage() {
           <span className="text-xs font-mono text-gray-500">{complaint.id}</span>
           <StatusBadge status={complaint.status} />
         </div>
-        <h1 className="text-xl font-bold text-army-dark mb-1">{complaint.subcategory}</h1>
+        <h1 className="text-xl font-bold text-army-dark mb-1">{complaint.subcategory || complaint.category}</h1>
         <p className="text-sm text-gray-500">{complaint.category}</p>
       </div>
 
       {/* Meta row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
         {[
           { label: 'Filed', value: format(new Date(complaint.filedDate), 'd MMM yyyy') },
           { label: 'Priority', value: priority.label, color: complaint.priority === 'critical' ? 'text-red-600' : complaint.priority === 'high' ? 'text-amber-600' : undefined },
           { label: 'Open', value: `${daysOpen} days` },
-          { label: 'SLA', value: isClosed ? 'Complete' : slaBreached ? `${Math.abs(slaRemaining)}d overdue` : `${slaRemaining}d left`, color: slaBreached && !isClosed ? 'text-red-600' : isClosed ? 'text-gray-500' : 'text-green-600' },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-white rounded-xl border border-gray-100 px-4 py-3">
             <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">{label}</p>
@@ -120,21 +139,30 @@ function ComplaintDetailPage() {
         ))}
       </div>
 
-      {/* SLA breach warning */}
-      {slaBreached && !isClosed && (
-        <div className="flex items-center gap-2.5 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 mb-4">
-          <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
-          <p className="text-xs text-red-700">
-            SLA exceeded by {Math.abs(slaRemaining)} days. This complaint has been auto-escalated.
-          </p>
-        </div>
-      )}
-
       {/* Description */}
       <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 mb-4">
         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Description</h3>
         <p className="text-sm text-gray-600 leading-relaxed">{complaint.description}</p>
       </div>
+
+      {/* Voice Recording Playback */}
+      {complaint.voiceRecording && (
+        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 mb-4">
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Voice Recording</h3>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleVoicePlayback}
+              className="w-8 h-8 rounded-full bg-army flex items-center justify-center shrink-0 hover:bg-army-dark transition-colors"
+            >
+              {isPlayingVoice ? <Pause className="w-3.5 h-3.5 text-white" /> : <Play className="w-3.5 h-3.5 text-white ml-0.5" />}
+            </button>
+            <div>
+              <p className="text-sm font-medium text-army-dark">Voice recording</p>
+              <p className="text-xs text-gray-500">{formatDuration(complaint.voiceRecording.duration)}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Attachments — encrypted at rest */}
       <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 mb-4">
@@ -295,7 +323,7 @@ function ComplaintDetailPage() {
         {!isClosed && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Add Response</p>
-            {complaint.status === 'needs-more-info' && (
+            {complaint.status === 'action-required' && (
               <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 flex items-start gap-2.5 mb-3">
                 <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
                 <div>
@@ -357,4 +385,3 @@ function ComplaintDetailPage() {
     </div>
   )
 }
-
