@@ -7,27 +7,28 @@ export const Route = createFileRoute('/login')({
 })
 
 const DEMO_ACCOUNTS = [
-  { rank: 'Capt.', name: 'Adeyemi', role: 'Personnel', armyNumber: 'NA/23/01234', color: 'army' },
-  { rank: 'Pvt.', name: 'Musa', role: 'New User', armyNumber: 'NA/15/05678', color: 'army' },
-  { rank: 'Maj.', name: 'Okonkwo', role: 'Div Admin', armyNumber: 'DA/10/00456', color: 'gold' },
-  { rank: 'Col.', name: 'Nwachukwu', role: 'Super Admin', armyNumber: 'SA/05/00123', color: 'dark' },
-] as const
+  { rank: 'Capt.', name: 'Adeyemi', role: 'Personnel', armyNumber: 'NA/23/01234', color: 'army' as const },
+  { rank: 'Pvt.', name: 'Musa', role: 'First Login', armyNumber: 'NA/15/05678', color: 'blue' as const },
+  { rank: 'Maj.', name: 'Okonkwo', role: 'Div Admin', armyNumber: 'DA/10/00456', color: 'gold' as const },
+  { rank: 'Col.', name: 'Nwachukwu', role: 'Super Admin', armyNumber: 'SA/05/00123', color: 'dark' as const },
+]
 
 const ROLE_STYLES = {
   army: {
-    badge: 'bg-army/10 text-army border-army/20',
-    ring: 'ring-army/20',
-    initials: 'bg-army/10 text-army',
+    badge: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+    initials: 'bg-emerald-50 text-emerald-700',
+  },
+  blue: {
+    badge: 'bg-sky-50 text-sky-700 ring-1 ring-sky-200',
+    initials: 'bg-sky-50 text-sky-700',
   },
   gold: {
-    badge: 'bg-army-gold/10 text-army-gold-light border-army-gold/20',
-    ring: 'ring-army-gold/20',
-    initials: 'bg-army-gold/10 text-army-gold',
+    badge: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+    initials: 'bg-amber-50 text-amber-700',
   },
   dark: {
-    badge: 'bg-army-dark/10 text-army-dark border-army-dark/20',
-    ring: 'ring-army-dark/20',
-    initials: 'bg-army-dark/10 text-army-dark',
+    badge: 'bg-violet-50 text-violet-700 ring-1 ring-violet-200',
+    initials: 'bg-slate-100 text-slate-700',
   },
 } as const
 
@@ -246,8 +247,8 @@ function LoginPage() {
             <div className="flex-1 h-px bg-army-sand/80" />
           </div>
 
-          {/* Demo accounts — elevated cards */}
-          <div className="grid gap-3">
+          {/* Demo accounts */}
+          <div className="grid gap-2.5">
             {DEMO_ACCOUNTS.map((account) => {
               const styles = ROLE_STYLES[account.color]
               return (
@@ -255,22 +256,19 @@ function LoginPage() {
                   key={account.armyNumber}
                   type="button"
                   onClick={() => fillDemo(account.armyNumber)}
-                  className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-army-sand/60 hover:border-army-sand hover:shadow-sm transition-all group cursor-pointer`}
+                  className="w-full text-left flex items-center gap-3.5 px-4 py-3.5 rounded-xl bg-white border border-army-sand/50 hover:border-army-sand hover:shadow-md transition-all group cursor-pointer"
                 >
-                  <div className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${styles.initials}`}>
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${styles.initials}`}>
                     {account.name[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-army-dark">
-                        {account.rank} {account.name}
-                      </span>
-                      <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${styles.badge}`}>
-                        {account.role}
-                      </span>
-                    </div>
+                    <span className="text-sm font-semibold text-army-dark block">
+                      {account.rank} {account.name}
+                    </span>
+                    <span className={`inline-block mt-1 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md ${styles.badge}`}>
+                      {account.role}
+                    </span>
                   </div>
-                  {/* Arrow */}
                   <svg className="w-4 h-4 text-army-dark/15 group-hover:text-army-dark/40 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                   </svg>

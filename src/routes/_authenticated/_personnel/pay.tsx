@@ -12,8 +12,7 @@ import {
 import { Button } from '#/components/ui/button'
 import { pdf } from '@react-pdf/renderer'
 import { PayslipPDF } from '#/lib/pdf/payslip-template'
-import { TaxCertPDF } from '#/lib/pdf/tax-cert-template'
-import { Download, FileText, ChevronDown, Lock } from 'lucide-react'
+import { Download, ChevronDown, Lock } from 'lucide-react'
 import { useState } from 'react'
 import type { Payslip } from '#/types/payslip'
 
@@ -81,16 +80,6 @@ function PayDocumentsPage() {
     URL.revokeObjectURL(url)
   }
 
-  const downloadTaxCert = async () => {
-    const blob = await pdf(<TaxCertPDF user={user} taxYear={new Date().getFullYear() - 1} />).toBlob()
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `TaxCert-${user.armyNumber.replace(/\//g, '')}-2025.pdf`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
@@ -119,26 +108,6 @@ function PayDocumentsPage() {
           </div>
         </div>
       )}
-
-      {/* Tax Certificate */}
-      <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-army/8 flex items-center justify-center shrink-0">
-            <FileText className="w-5 h-5 text-army" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-army-dark">Tax Exemption Certificate</p>
-            <p className="text-xs text-gray-500">Financial Year {new Date().getFullYear() - 1}</p>
-          </div>
-        </div>
-        <button
-          onClick={() => requestDownload(downloadTaxCert)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-army-gold text-army-dark text-xs font-bold hover:bg-army-gold-light transition-colors"
-        >
-          <Lock className="w-3.5 h-3.5" />
-          Download PDF
-        </button>
-      </div>
 
       {/* Filters */}
       <div className="flex gap-1.5 flex-wrap">
@@ -192,7 +161,7 @@ function PayDocumentsPage() {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-army-gold hover:bg-army-gold/8 transition-colors"
                     >
                       <Download className="w-3.5 h-3.5" />
-                      PDF
+                      Payslip
                     </button>
                   </div>
                 </div>
