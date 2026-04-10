@@ -8,6 +8,7 @@ export const Route = createFileRoute('/login')({
 
 const DEMO_ACCOUNTS = [
   { rank: 'Capt.', name: 'Adeyemi', role: 'Personnel', armyNumber: 'NA/23/01234', color: 'army' },
+  { rank: 'Pvt.', name: 'Musa', role: 'New User', armyNumber: 'NA/15/05678', color: 'army' },
   { rank: 'Maj.', name: 'Okonkwo', role: 'Div Admin', armyNumber: 'DA/10/00456', color: 'gold' },
   { rank: 'Col.', name: 'Nwachukwu', role: 'Super Admin', armyNumber: 'SA/05/00123', color: 'dark' },
 ] as const
@@ -222,8 +223,14 @@ function LoginPage() {
             </button>
           </form>
 
-          {/* Forgot password link */}
-          <div className="mt-4 text-center">
+          {/* Help links */}
+          <div className="mt-5 flex flex-col items-center gap-2.5">
+            <Link
+              to="/onboard"
+              className="text-sm text-army font-medium hover:text-army-gold transition-colors"
+            >
+              First time? Set up your account
+            </Link>
             <Link
               to="/reset-password"
               className="text-sm text-army-dark/40 hover:text-army-dark/60 transition-colors"
